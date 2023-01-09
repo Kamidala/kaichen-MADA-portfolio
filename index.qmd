@@ -1,16 +1,15 @@
 ---
-title: "My website and data analysis portfolio"
+title: "Kai Chen's Website and Data Analysis Portfolio"
 output: 
   html_document:
     toc: FALSE
 ---
 
-# Hello
+# Greetings!
 
-### And hello again
+### This website will be in use for the Spring 2023 semester.
 
-Welcome to **my website** and _data analysis portfolio._ 
+This website is been created as an assignment for the Modern Data Analysis course at the University of Georgia. This website will also function as a data analysis portfolio from January to May.
 
-
-* Please use the `Menu Bar` above to look around.
-* Have fun!
+-   Please use the `Menu Bar` above to look around.
+-   If you have any questions, please contact me via email.

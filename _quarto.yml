@@ -3,7 +3,7 @@ project:
   output-dir: docs
 
 website:
-  title: "My Data Analysis Portfolio"
+  title: "Data Analysis Portfolio: Kai Chen"
   navbar:
     left:
       - text: "About Me"
@@ -18,11 +18,11 @@ website:
             href: ./tidytuesday_exercise.html
     right:
       - icon: github 
-        href: URL-TO-THIS-REPOSITORY-HERE        
+        href: https://github.com/Kamidala/kaichen-MADA-portfolio        
 
 format:
   html:
-    theme: cosmo
+    theme: pulse
     highlight: zenburn
     css: styles.css
     toc: FALSE

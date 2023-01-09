@@ -1,0 +1,65 @@
+[
+  {
+    "objectID": "aboutme.html",
+    "href": "aboutme.html",
+    "title": "About Me",
+    "section": "",
+    "text": "Kai Chen"
+  },
+  {
+    "objectID": "aboutme.html#short-biography",
+    "href": "aboutme.html#short-biography",
+    "title": "About Me",
+    "section": "Short Biography",
+    "text": "Short Biography\nI am a Master of Public Health (MPH) student with an emphasis in Epidemiology. I completed my undergraduate education at the University of Georgia (UGA) with a major in Biology before matriculating into the MPH program via the dual degree pathway offered (4+1). As a future public health professional who comes from a multicultural background and speaks three languages, I find the international stage to be very important to ongoing public health topics.\n\nFun Fact\nI very much enjoy foreign language musicals and have met some of my closest friends through a French musical it seems no one has ever heard of: Mozart L’Opera Rock."
+  },
+  {
+    "objectID": "aboutme.html#goals-for-this-course",
+    "href": "aboutme.html#goals-for-this-course",
+    "title": "About Me",
+    "section": "Goals for This Course",
+    "text": "Goals for This Course\nI hope to learn more in-depth techniques for data analysis and implement them in my current and future research. I am especially interested in how this class will approach machine learning, since it can be used with such versatility (and even predict earthquake damage)."
+  },
+  {
+    "objectID": "aboutme.html#research-interests",
+    "href": "aboutme.html#research-interests",
+    "title": "About Me",
+    "section": "Research Interests",
+    "text": "Research Interests\nMy primary interest is in respiratory illness, especially infectious respiratory diseases. For this semester, I am participating in research on household air pollution while interning abroad in Guatemala (to analyze their surveillance data on respiratory disease)."
+  },
+  {
+    "objectID": "aboutme.html#training",
+    "href": "aboutme.html#training",
+    "title": "About Me",
+    "section": "Training",
+    "text": "Training\nI have attended two outbreak simulations hosted by UGA in the past, and I have also collected data on behalf of the Centers for Disease Control and Prevention in 2021. Previous research experiences and coursework have led to skills in JMP, SAS, and R."
+  },
+  {
+    "objectID": "coding_exercise.html",
+    "href": "coding_exercise.html",
+    "title": "R Coding Exercise",
+    "section": "",
+    "text": "Placeholder file for the future R coding exercise."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Kai Chen’s Website and Data Analysis Portfolio",
+    "section": "",
+    "text": "Greetings!\n\nThis website will be in use for the Spring 2023 semester.\nThis website is been created as an assignment for the Modern Data Analysis course at the University of Georgia. This website will also function as a data analysis portfolio from January to May.\n\nPlease use the Menu Bar above to look around.\nIf you have any questions, please contact me via email."
+  },
+  {
+    "objectID": "tidytuesday_exercise.html",
+    "href": "tidytuesday_exercise.html",
+    "title": "Tidy Tuesday Exercise",
+    "section": "",
+    "text": "Placeholder file for the future Tidy Tuesday exercise."
+  },
+  {
+    "objectID": "visualization_exercise.html",
+    "href": "visualization_exercise.html",
+    "title": "Visualization Exercise",
+    "section": "",
+    "text": "Placeholder file for the future visualization exercise."
+  }
+]

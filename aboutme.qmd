@@ -1,8 +1,29 @@
 ---
-title: "About me"
+title: "About Me"
 output: 
   html_document:
+      link-external-icon: TRUE
       toc: FALSE
 ---
 
-Add some text and a figure describing myself.
+![Kai Chen](IMG09332.png){width="33%"}
+
+## Short Biography
+
+I am a Master of Public Health (MPH) student with an emphasis in Epidemiology. I completed my undergraduate education at the University of Georgia (UGA) with a major in Biology before matriculating into the MPH program via the dual degree pathway offered (4+1). As a future public health professional who comes from a multicultural background and speaks three languages, I find the international stage to be very important to ongoing public health topics.
+
+### Fun Fact
+
+I very much enjoy foreign language musicals and have met some of my closest friends through a French musical it seems no one has ever heard of: Mozart L'Opera Rock.
+
+## Goals for This Course
+
+I hope to learn more in-depth techniques for data analysis and implement them in my current and future research. I am especially interested in how this class will approach machine learning, since it can be used with such versatility (and even [predict earthquake damage](https://www.sciencedirect.com/science/article/pii/S1350630722009165?casa_token=_dfKkYa5rMIAAAAA:CnqtyZwzDqtjCCiVvSfZYrjP8x2ZVxP4r6pPn8RCduIZvWawqiX_G3QBVoqLoE1DHyHIlf09Mm3H)).
+
+## Research Interests
+
+My primary interest is in respiratory illness, especially infectious respiratory diseases. For this semester, I am participating in research on household air pollution while interning abroad in Guatemala (to analyze their surveillance data on respiratory disease).
+
+## Training
+
+I have attended two outbreak simulations hosted by UGA in the past, and I have also collected data on behalf of the Centers for Disease Control and Prevention in 2021. Previous research experiences and coursework have led to skills in JMP, SAS, and R.
