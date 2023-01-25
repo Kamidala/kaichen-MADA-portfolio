@@ -96,3 +96,32 @@ summary(fit2)
 ```
 
 According to the first model, infant mortality is a significant predictor (p \< 0.001) on life expectancy for African nations. In contrast, population is not a significant predictor (p = 0.616) for life expectancy in the second model.
+
+Hi! This section added by Katie Wells.
+
+Continued analysis of the dataset
+
+```{r}
+## Comparing fertility and infant mortality for the 2000 dataset
+ggplot(data_2000, aes(x = infant_mortality, y = fertility)) + geom_point() + labs(x = "Infant Mortality", y = "Fertility", title = "Infant Mortality vs Fertility for African Nations in 2000")
+## Comparing population size and fertility for the 2000 dataset
+ggplot(data_2000, aes(x = population, y = fertility)) + geom_point() + scale_x_log10() + labs(x = "Population (Log10)", y = "Fertility", title = "Population (Log10) vs Fertility for African Nations in 2000")
+```
+There appears to be a positive correlation between infant mortality and fertility but no strong correlation between fertility and population size. 
+
+```{r}
+## load packages
+library("broom")
+```
+
+
+```{r}
+## Fitting fertility against population and infant mortality  in a linear model
+fit3 <- lm(fertility ~ population, data = data_2000)
+fit4 <- lm(fertility ~ infant_mortality, data = data_2000)
+
+## show fit output as a table
+tidy(fit3)
+tidy(fit4)
+```
+The fit of first model shows that infant mortality is a significant predictor (p \< 0.001) on fertility for African nations. In contrast, population is not a significant predictor (p = 0.064) for fertility in the second model.
