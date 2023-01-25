@@ -5,4 +5,94 @@ output:
     toc: FALSE
 ---
 
-Placeholder file for the future R coding exercise.
+# Loading Packages/Libraries
+
+```{r}
+# Load Packages
+library(dslabs)
+library(tidyverse)
+```
+
+# Investigating Gapminder
+
+```{r}
+# Check the Help File for Gapminder
+help(gapminder)
+
+# Data Structure
+str(gapminder)
+
+# Data Summary
+summary(gapminder)
+
+# Class
+class(gapminder)
+```
+
+# Data Processing
+
+```{r}
+# Assign African Countries to a New Object
+africadata <- gapminder %>% filter(continent == "Africa")
+
+## Find Missing Values in Infant Mortality
+years_of_na_infant_mortality <- africadata %>% select(year, infant_mortality) %>% filter(is.na(infant_mortality) == TRUE) %>% group_by(year) %>% count()
+unique(years_of_na_infant_mortality$year)
+
+# Checking New Object Structure and Summary
+str(africadata)
+summary(africadata)
+
+# Making New Datasets for Infant Mortality + Life Expectancy (IMLE) & Population + Life Expectancy (PLE)
+IMLE <- africadata %>% select(infant_mortality, life_expectancy)
+PLE <- africadata %>% select(population, life_expectancy)
+
+# Checking IMLE and PLE Structure and Summaries
+## Structure
+str(IMLE)
+str(PLE)
+
+## Summary
+summary(IMLE)
+summary(PLE)
+```
+
+# Graphing
+
+```{r}
+# IMLE: Infant Mortality vs Life Expectancy
+ggplot(IMLE, aes(x = infant_mortality, y = life_expectancy)) + geom_point() + labs(x = "Infant Mortality", y = "Life Expectancy", title = "Infant Mortality vs Life Expectancy for African Nations")
+
+# PLE
+ggplot(PLE, aes(x = population, y = life_expectancy)) + geom_point() + scale_x_log10() + labs(x = "Population (Log10)", y = "Life Expectancy", title = "Population (Log10) vs Life Expectancy for African Nations")
+
+```
+
+# Data From the Year 2000
+
+```{r}
+# Make New Object to House Year 2000 Data
+data_2000 <- africadata %>% filter(year == 2000)
+
+# Check Structure and Summary
+str(data_2000)
+summary(data_2000)
+
+# Reevaluating Previous Plots
+IMLE <- data_2000 %>% select(infant_mortality, life_expectancy)
+PLE <- data_2000 %>% select(population, life_expectancy)
+## IMLE: Infant Mortality vs Life Expectancy
+ggplot(IMLE, aes(x = infant_mortality, y = life_expectancy)) + geom_point() + labs(x = "Infant Mortality", y = "Life Expectancy", title = "Infant Mortality vs Life Expectancy for African Nations in 2000")
+## PLE
+ggplot(PLE, aes(x = population, y = life_expectancy)) + geom_point() + scale_x_log10() + labs(x = "Population (Log10)", y = "Life Expectancy", title = "Population (Log10) vs Life Expectancy for African Nations in 2000")
+
+# Fitting a Simple Model
+fit1 <- lm(life_expectancy ~ infant_mortality, data = data_2000)
+fit2 <- lm(life_expectancy ~ population, data = data_2000)
+
+# Summary of Models
+summary(fit1)
+summary(fit2)
+```
+
+According to the first model, infant mortality is a significant predictor (p \< 0.001) on life expectancy for African nations. In contrast, population is not a significant predictor (p = 0.616) for life expectancy in the second model.
