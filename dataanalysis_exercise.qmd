@@ -1,0 +1,74 @@
+---
+title: "Data Analysis Exercise"
+output:
+  html_document:
+    link-external-icon: TRUE
+    toc: FALSE
+bibliography: "data-analysis-exercise/data/exercise_bib.bib"
+---
+
+# Data Information
+
+## Data Source
+
+This data was obtained from the [Centers for Disease Control and Prevention (CDC)'s National Notifiable Diseases Surveillance System (NNDSS)](https://data.cdc.gov/NNDSS/NNDSS-Weekly-Data/x9gk-5huc).
+
+## Data Description
+
+Each week, the Division of Health Informatics and Surveillance at the CDC releases a weekly report describing "provisional" cases of diseases within the United States and its territories. This dataset was released on January 26, 2023 [@divisionofhealthinformaticsandsurveillance2023].
+
+## Data Contents
+
+This dataset contains 424,000 rows and 16 columns.
+
+# Data Loading and Processing
+
+## Load Libraries
+
+```{r echo = FALSE}
+# Load Libraries
+library(tidyverse)
+library(gtsummary)
+```
+
+## Load Data
+
+```{r}
+NNDSS_Weekly <- read_csv("data-analysis-exercise/data/NNDSS_Weekly_Data.csv")
+```
+
+## Cleaning Data
+
+Variables of interest include state/territory, cases this week, and disease.
+
+```{r}
+# Set Cases in New York City To Be Counted as Cases in New York (State)
+NNDSS_Weekly <- NNDSS_Weekly %>%
+  mutate(State_Territory = case_when(
+    LOCATION1 == "NEW YORK CITY" ~ "NEW YORK",
+    TRUE ~ LOCATION1))
+
+# Rename Variables
+NNDSS_Weekly <- NNDSS_Weekly %>% rename(Disease = Label) %>%
+  rename(Year = `Current MMWR Year`) %>% rename(Week = `MMWR WEEK`) %>% rename(Week_Cases = `Current week`)
+
+# Remove Extra Spaces and NAs in State_Territory
+NNDSS_Weekly$Disease <- sub("  ", " ", NNDSS_Weekly$Disease)
+NNDSS_Weekly <- NNDSS_Weekly %>%
+  filter(State_Territory != "NA")
+
+# Preliminary Graph: Cases per State
+ggplot(NNDSS_Weekly, aes(y = State_Territory, x = Week_Cases)) + geom_col()
+```
+
+# Data Summary
+
+```{r}
+tbl_summary(NNDSS_Weekly %>% select(Week_Cases, State_Territory, Disease, Year), by = Year)
+```
+
+# Save RDS File
+
+```{r}
+saveRDS(NNDSS_Weekly, file = "data-analysis-exercise/output/clean_NNDSS.rds")
+```
