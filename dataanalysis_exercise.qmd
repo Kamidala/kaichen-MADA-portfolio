@@ -72,3 +72,63 @@ tbl_summary(NNDSS_Weekly %>% select(Week_Cases, State_Territory, Disease, Year),
 ```{r}
 saveRDS(NNDSS_Weekly, file = "data-analysis-exercise/output/clean_NNDSS.rds")
 ```
+
+This section was added by Hayley Hemme
+
+Let's load the cleaned data.
+```{r}
+library(tidyverse)
+NNDSS_clean <- readRDS("data-analysis-exercise/output/clean_NNDSS.rds")
+
+NNDSS_clean %>% pull(Disease) %>% unique()
+```
+
+Let's look at bit more into Invasive pneumococcal disease in all ages. We'll start removing weeks with 'NA' for reported weekly cases.
+```{r}
+ipd <- NNDSS_clean %>% filter(Disease == "Invasive pneumococcal disease, all ages, Confirmed") %>% 
+  filter(Week_Cases != "NA") 
+```
+
+Next, let's find the weekly total for 2022.
+```{r message = FALSE}
+weekly_total_ipd <- ipd %>%
+  group_by(Week, Year) %>%
+  summarise(Week_total = sum(Week_Cases))
+```
+
+Let's plot it now! Let's filter out to only include weeks in 2022 for now
+```{r}
+weekly_total_ipd %>% filter(Year == "2022") %>% ggplot() + stat_summary(aes(x = Week, y= Week_total), fun = "mean", geom = "line", linewidth = 1) + labs(x = "Week", y = "Cases", title = "Weekly Cases of Confirmed Invasive Pneumococcal Disease (all ages)
+in the United States -- 2022") +  theme(legend.title.align = 0.5, legend.direction = "vertical", legend.box.just = "center") + theme(plot.title = element_text(hjust = 0.5, size = 12))
+```
+Let's also compare the cases counts from 2022 to the previous 52 weeks.
+```{r message = FALSE}
+weekly_total_ipd2 <- ipd %>%
+  group_by(Week, Year) %>%
+  summarise(Week_total_p52 = sum(`Previous 52 week Max`))
+
+weekly_total_ipd <- full_join(ipd, weekly_total_ipd, by = c("Week", "Year"))
+weekly_total_ipd <- full_join(weekly_total_ipd, weekly_total_ipd2, by = c("Week", "Year"))
+```
+
+We'll also add some design element to the plot...
+```{r}
+weekly_total_ipd %>% filter(Year == "2022") %>% ggplot() + stat_summary(aes(x = Week, y= Week_total), fun = "mean", geom = "line", linewidth = 1, color = "lightblue4") + labs(x = "Week", y = "Cases", title = "Weekly Cases of Confirmed Invasive Pneumococcal Disease (all ages)
+in the United States -- 2021-2022", c) + stat_summary(aes(x = Week, y= `Week_total_p52`), fun = "mean", geom = "line", linewidth = 1, linetype = "dashed", color = "lightblue3") +  theme(legend.title.align = 0.5, legend.direction = "vertical", legend.box.just = "center") + theme(plot.title = element_text(hjust = 0.5, size = 12)) +     
+geom_text(aes(x = 13, y = 60, label = "2022"), color = "lightblue4") + 
+geom_text(aes(x = 30, y = 400, label = "2021"), color = "lightblue3")
+ 
+```
+
+Let's see if we can add weekly cases from 2023 so far...
+```{r}
+wc_2023 <-  weekly_total_ipd %>% filter(Year == "2023")
+```
+
+Now let's plot the cases from 2021 to the third week of 2023 (most recent data at time of analysis) and adjust the scale a bit.
+```{r message = FALSE}
+weekly_total_ipd %>% filter(Year == "2022") %>% ggplot() + stat_summary(aes(x = Week, y= Week_total), fun = "mean", geom = "line", linewidth = 1, color = "lightblue4") + labs(x = "Week", y = "Cases", title = "Weekly Cases of Confirmed Invasive Pneumococcal Disease (all ages)
+in the United States -- 2021, 2022, and the first few weeks of 2023", c) + stat_summary(aes(x = Week, y= `Week_total_p52`), fun = "mean", geom = "line", linewidth = 1, linetype = "dashed", color = "lightblue3") +  theme(legend.title.align = 0.5, legend.direction = "vertical", legend.box.just = "center") + theme(plot.title = element_text(hjust = 0.5, size = 12)) +     
+geom_text(aes(x = 13, y = 60, label = "2022"), color = "lightblue4") + 
+geom_text(aes(x = 30, y = 400, label = "2021"), color = "lightblue3") + stat_summary(data = wc_2023, aes(x = Week, y= Week_total), geom = "line", linewidth = 1, linetype = "dotted", color = "maroon") + geom_text(aes(x = 4, y = 250, label = "2023"), color = "maroon") + scale_x_continuous(breaks = seq(1, 52, 3))
+```
