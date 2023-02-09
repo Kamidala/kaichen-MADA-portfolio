@@ -20,6 +20,88 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1.6em;
   vertical-align: middle;
 }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
 </style>
 
 
@@ -100,6 +182,10 @@ ul.task-list li input[type="checkbox"] {
     <a class="dropdown-item" href="././tidytuesday_exercise.html">
  <span class="dropdown-text">Tidy Tuesday Exercise</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="././dataanalysis_exercise.html">
+ <span class="dropdown-text">Module 4: Data Analysis Exercise (Week of 1/30)</span></a>
+  </li>  
     </ul>
   </li>
 </ul>
@@ -140,11 +226,205 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
-<p>Placeholder file for the future visualization exercise.</p>
+<section id="source" class="level1">
+<h1>Source</h1>
+<p>The data for this exercise was obtained from the Harvard Dataverse - Cooperative Congressional Election Study (CCES). This dataset was released in 2017 and contains “a nationally representative sample of 64,600 American adults” from 2016 <span class="citation" data-cites="ansolabehere2018">(<a href="#ref-ansolabehere2018" role="doc-biblioref">Ansolabehere and Schaffner 2018</a>)</span>. A data dictionary/codebook was also available for view.</p>
+<p>Because the original dataset was over 100 MB, a version with several variables removed was saved and used for this analysis. The original dataset can still be found and downloaded from the CCES site.</p>
+</section>
+<section id="original-plot" class="level1">
+<h1>Original Plot</h1>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="data/original_visualization.png" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">Graphical breakdown of voters for the two main political parties’ primaries in the United States</figcaption><p></p>
+</figure>
+</div>
+<p>The data visualization first appeared on the site FiveThirtyEight in the article *Why Democrats Struggle to Motivate a ‘Religious Left’” <span class="citation" data-cites="thomson-deveaux2019">(<a href="#ref-thomson-deveaux2019" role="doc-biblioref">Thomson-DeVeaux 2019</a>)</span>.</p>
+</section>
+<section id="recreation-of-plot" class="level1">
+<h1>Recreation of Plot</h1>
+<section id="load-libraries" class="level2">
+<h2 class="anchored" data-anchor-id="load-libraries">Load Libraries</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
+✔ ggplot2 3.4.0      ✔ purrr   1.0.1 
+✔ tibble  3.1.8      ✔ dplyr   1.0.10
+✔ tidyr   1.2.1      ✔ stringr 1.5.0 
+✔ readr   2.1.3      ✔ forcats 0.5.2 
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggthemes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="load-data" class="level2">
+<h2 class="anchored" data-anchor-id="load-data">Load Data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">"data/CCES16_Common_OUTPUT_Feb2018_VV2.tab"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: One or more parsing issues, call `problems()` on your data frame for details,
+e.g.:
+  dat &lt;- vroom(...)
+  problems(dat)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 64600 Columns: 525
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: "\t"
+chr  (160): countyname, CurrentGovName, CurrentGovParty, CurrentHouseGender,...
+dbl  (361): tookpost, lookupzip, inputstate, cdid113, cdid115, countyfips, G...
+time   (4): starttime_pre, endtime_pre, starttime_post, endtime_post
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+</div>
+</section>
+<section id="data-manipulation-and-graphing" class="level2">
+<h2 class="anchored" data-anchor-id="data-manipulation-and-graphing">Data Manipulation and Graphing</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Variables of Interest: </span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="do">## CL_E2016PPEP (Political Party in 2016 Presidential Primary)</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>data_specific <span class="ot">&lt;-</span> data <span class="sc">%&gt;%</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(CL_E2016PPEP, religpew, race, hispanic) <span class="sc">%&gt;%</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(CL_E2016PPEP <span class="sc">==</span> <span class="st">"REP"</span> <span class="sc">|</span> CL_E2016PPEP <span class="sc">==</span> <span class="st">"DEM"</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="do">### Rename REP/DEM to subgroups used in original graph</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>data_specific <span class="ot">&lt;-</span> data_specific <span class="sc">%&gt;%</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">CL_E2016PPEP =</span> <span class="fu">case_when</span>(</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    CL_E2016PPEP <span class="sc">==</span> <span class="st">"REP"</span> <span class="sc">~</span> <span class="st">"Republican primary voters"</span>,</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    CL_E2016PPEP <span class="sc">==</span> <span class="st">"DEM"</span> <span class="sc">~</span> <span class="st">"Democratic primary voters"</span>))</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="do">### Change variable for political party into a factor so graph will be generated with </span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="do">### Republican voters on the left every time</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>data_specific<span class="sc">$</span>CL_E2016PPEP <span class="ot">&lt;-</span> <span class="fu">factor</span>(data_specific<span class="sc">$</span>CL_E2016PPEP, </span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Republican primary voters"</span>, <span class="st">"Democratic primary voters"</span>))</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="do">## pid3 (Political Identity) --&gt; ended up not being relevant</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="do">## Religion: Christian, Non-Christian/Something Else, No Religious Affiliation</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>data_specific <span class="ot">&lt;-</span> data_specific <span class="sc">%&gt;%</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Religious_Affiliation =</span> <span class="fu">case_when</span>(</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>    religpew <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">"Christian"</span>,</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>    religpew <span class="sc">==</span> <span class="dv">2</span> <span class="sc">~</span> <span class="st">"Christian"</span>,</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>    religpew <span class="sc">==</span> <span class="dv">3</span> <span class="sc">~</span> <span class="st">"Christian"</span>,</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>    religpew <span class="sc">==</span> <span class="dv">4</span> <span class="sc">~</span> <span class="st">"Christian"</span>,</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>    religpew <span class="sc">==</span> <span class="dv">5</span> <span class="sc">~</span> <span class="st">"Non-Christian or Something Else"</span>,</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>    religpew <span class="sc">==</span> <span class="dv">6</span> <span class="sc">~</span> <span class="st">"Non-Christian or Something Else"</span>,</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>    religpew <span class="sc">==</span> <span class="dv">7</span> <span class="sc">~</span> <span class="st">"Non-Christian or Something Else"</span>,</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>    religpew <span class="sc">==</span> <span class="dv">8</span> <span class="sc">~</span> <span class="st">"Non-Christian or Something Else"</span>,</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>    religpew <span class="sc">==</span> <span class="dv">12</span> <span class="sc">~</span> <span class="st">"Non-Christian or Something Else"</span>,</span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>    religpew <span class="sc">==</span> <span class="dv">11</span> <span class="sc">~</span> <span class="st">"No Religious Affiliation"</span>,</span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">"NA"</span>))</span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>data_specific<span class="sc">$</span>Religious_Affiliation <span class="ot">&lt;-</span> <span class="fu">factor</span>(data_specific<span class="sc">$</span>Religious_Affiliation, </span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>      <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"No Religious Affiliation"</span>,</span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"Non-Christian or Something Else"</span>,</span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"Christian"</span>))</span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a><span class="do">### Realization at this point there isn't a way to break a subgroup down by another </span></span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a><span class="do">### variable, so will make another religion variable and break down Christianity </span></span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a><span class="do">### specifically by race</span></span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a><span class="do">## Race/Ethnicity: Black, Hispanic, White, and Other Races</span></span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>data_specific <span class="ot">&lt;-</span> data_specific <span class="sc">%&gt;%</span></span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Racial_Group =</span> <span class="fu">case_when</span>(</span>
+<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>    race <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">"White"</span>,</span>
+<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a>    race <span class="sc">==</span> <span class="dv">2</span> <span class="sc">~</span> <span class="st">"Black"</span>,</span>
+<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a>    race <span class="sc">==</span> <span class="dv">3</span> <span class="sc">|</span> hispanic <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">"Hispanic"</span>,</span>
+<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a>    race <span class="sc">==</span> <span class="dv">4</span> <span class="sc">~</span> <span class="st">"Other Race"</span>,</span>
+<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a>    race <span class="sc">==</span> <span class="dv">5</span> <span class="sc">~</span> <span class="st">"Other Race"</span>,</span>
+<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a>    race <span class="sc">==</span> <span class="dv">6</span> <span class="sc">~</span> <span class="st">"Other Race"</span>,</span>
+<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a>    race <span class="sc">==</span> <span class="dv">7</span> <span class="sc">~</span> <span class="st">"Other Race"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Christian_Racial_Group =</span> <span class="fu">case_when</span>(</span>
+<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a>    Religious_Affiliation <span class="sc">==</span> <span class="st">"Christian"</span> <span class="sc">&amp;</span> Racial_Group <span class="sc">==</span> <span class="st">"Other Race"</span> <span class="sc">~</span> <span class="st">"Other Race"</span>,</span>
+<span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a>    Religious_Affiliation <span class="sc">==</span> <span class="st">"Christian"</span> <span class="sc">&amp;</span> Racial_Group <span class="sc">==</span> <span class="st">"Hispanic"</span> <span class="sc">~</span> <span class="st">"Hispanic"</span>,</span>
+<span id="cb7-55"><a href="#cb7-55" aria-hidden="true" tabindex="-1"></a>    Religious_Affiliation <span class="sc">==</span> <span class="st">"Christian"</span> <span class="sc">&amp;</span> Racial_Group <span class="sc">==</span> <span class="st">"Black"</span> <span class="sc">~</span> <span class="st">"Black"</span>,</span>
+<span id="cb7-56"><a href="#cb7-56" aria-hidden="true" tabindex="-1"></a>    Religious_Affiliation <span class="sc">==</span> <span class="st">"Christian"</span> <span class="sc">&amp;</span> Racial_Group <span class="sc">==</span> <span class="st">"White"</span> <span class="sc">~</span> <span class="st">"White"</span>,</span>
+<span id="cb7-57"><a href="#cb7-57" aria-hidden="true" tabindex="-1"></a>    Religious_Affiliation <span class="sc">==</span> <span class="st">"Non-Christian or Something Else"</span> <span class="sc">~</span> <span class="st">"Non-Christian or Something Else"</span>,</span>
+<span id="cb7-58"><a href="#cb7-58" aria-hidden="true" tabindex="-1"></a>    Religious_Affiliation <span class="sc">==</span> <span class="st">"No Religious Affiliation"</span> <span class="sc">~</span> <span class="st">"No Religious Affiliation"</span>,</span>
+<span id="cb7-59"><a href="#cb7-59" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">"NA"</span>))</span>
+<span id="cb7-60"><a href="#cb7-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-61"><a href="#cb7-61" aria-hidden="true" tabindex="-1"></a><span class="do">### Ensure order is as appears on original graph</span></span>
+<span id="cb7-62"><a href="#cb7-62" aria-hidden="true" tabindex="-1"></a>data_specific<span class="sc">$</span>Christian_Racial_Group <span class="ot">&lt;-</span> <span class="fu">factor</span>(data_specific<span class="sc">$</span>Christian_Racial_Group, </span>
+<span id="cb7-63"><a href="#cb7-63" aria-hidden="true" tabindex="-1"></a>      <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"No Religious Affiliation"</span>,</span>
+<span id="cb7-64"><a href="#cb7-64" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"Non-Christian or Something Else"</span>,</span>
+<span id="cb7-65"><a href="#cb7-65" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"Other Race"</span>, </span>
+<span id="cb7-66"><a href="#cb7-66" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"Black"</span>, </span>
+<span id="cb7-67"><a href="#cb7-67" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"Hispanic"</span>, </span>
+<span id="cb7-68"><a href="#cb7-68" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"White"</span>))</span>
+<span id="cb7-69"><a href="#cb7-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-70"><a href="#cb7-70" aria-hidden="true" tabindex="-1"></a><span class="co"># Ended up not needing: data_specific &lt;- data_specific %&gt;% arrange(Christian_Racial_Group)</span></span>
+<span id="cb7-71"><a href="#cb7-71" aria-hidden="true" tabindex="-1"></a><span class="co"># %&gt;% group_by(Christian_Racial_Group) %&gt;% mutate(label_y = cumsum())</span></span>
+<span id="cb7-72"><a href="#cb7-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-73"><a href="#cb7-73" aria-hidden="true" tabindex="-1"></a><span class="do">## Make a Baseline Dataframe</span></span>
+<span id="cb7-74"><a href="#cb7-74" aria-hidden="true" tabindex="-1"></a>data_baseline <span class="ot">&lt;-</span> data_specific <span class="sc">%&gt;%</span></span>
+<span id="cb7-75"><a href="#cb7-75" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Religious_Affiliation <span class="sc">!=</span> <span class="st">"NA"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-76"><a href="#cb7-76" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Racial_Group <span class="sc">!=</span> <span class="st">"NA"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-77"><a href="#cb7-77" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Christian_Racial_Group <span class="sc">!=</span> <span class="st">"NA"</span>)</span>
+<span id="cb7-78"><a href="#cb7-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-79"><a href="#cb7-79" aria-hidden="true" tabindex="-1"></a><span class="do">## Investigate Proportion of Each Group</span></span>
+<span id="cb7-80"><a href="#cb7-80" aria-hidden="true" tabindex="-1"></a><span class="do">### Create a Table That Calculates Total of Each Party</span></span>
+<span id="cb7-81"><a href="#cb7-81" aria-hidden="true" tabindex="-1"></a>proportions_data_specific_total <span class="ot">&lt;-</span> data_baseline <span class="sc">%&gt;%</span></span>
+<span id="cb7-82"><a href="#cb7-82" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(CL_E2016PPEP, <span class="fu">rev</span>(Christian_Racial_Group)) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-83"><a href="#cb7-83" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(CL_E2016PPEP) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-84"><a href="#cb7-84" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb7-85"><a href="#cb7-85" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">total =</span> n)</span>
+<span id="cb7-86"><a href="#cb7-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-87"><a href="#cb7-87" aria-hidden="true" tabindex="-1"></a><span class="do">### Calculate Proportions Based on Total of Each Party</span></span>
+<span id="cb7-88"><a href="#cb7-88" aria-hidden="true" tabindex="-1"></a>proportions_data_specific <span class="ot">&lt;-</span> data_baseline <span class="sc">%&gt;%</span></span>
+<span id="cb7-89"><a href="#cb7-89" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(CL_E2016PPEP, <span class="fu">rev</span>(Christian_Racial_Group)) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-90"><a href="#cb7-90" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(CL_E2016PPEP, Christian_Racial_Group) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-91"><a href="#cb7-91" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb7-92"><a href="#cb7-92" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(proportions_data_specific_total, <span class="at">by =</span> <span class="st">"CL_E2016PPEP"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-93"><a href="#cb7-93" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Percentage =</span> n<span class="sc">/</span>total) <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(CL_E2016PPEP) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-94"><a href="#cb7-94" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">label_y =</span> <span class="dv">1</span> <span class="sc">-</span> (<span class="fu">cumsum</span>(Percentage) <span class="sc">-</span> <span class="fl">0.5</span> <span class="sc">*</span> Percentage))</span>
+<span id="cb7-95"><a href="#cb7-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-96"><a href="#cb7-96" aria-hidden="true" tabindex="-1"></a><span class="co"># Data Visualization</span></span>
+<span id="cb7-97"><a href="#cb7-97" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> proportions_data_specific, </span>
+<span id="cb7-98"><a href="#cb7-98" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> CL_E2016PPEP, <span class="at">y =</span> Percentage, </span>
+<span id="cb7-99"><a href="#cb7-99" aria-hidden="true" tabindex="-1"></a>           <span class="at">group =</span> Christian_Racial_Group, </span>
+<span id="cb7-100"><a href="#cb7-100" aria-hidden="true" tabindex="-1"></a>           <span class="at">fill =</span> Christian_Racial_Group)) <span class="sc">+</span> </span>
+<span id="cb7-101"><a href="#cb7-101" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_discrete</span>(<span class="at">position =</span> <span class="st">"top"</span>) <span class="sc">+</span> </span>
+<span id="cb7-102"><a href="#cb7-102" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> </span>
+<span id="cb7-103"><a href="#cb7-103" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>(<span class="st">`</span><span class="at">No Religious Affiliation</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"limegreen"</span>,</span>
+<span id="cb7-104"><a href="#cb7-104" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">Non-Christian or Something Else</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"purple"</span>,</span>
+<span id="cb7-105"><a href="#cb7-105" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">Other Race</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"gold"</span>, </span>
+<span id="cb7-106"><a href="#cb7-106" aria-hidden="true" tabindex="-1"></a>      <span class="at">White =</span> <span class="st">"firebrick1"</span>, </span>
+<span id="cb7-107"><a href="#cb7-107" aria-hidden="true" tabindex="-1"></a>      <span class="at">Hispanic =</span> <span class="st">"darkorange"</span>, </span>
+<span id="cb7-108"><a href="#cb7-108" aria-hidden="true" tabindex="-1"></a>      <span class="at">Black =</span> <span class="st">"orange"</span>)) <span class="sc">+</span> </span>
+<span id="cb7-109"><a href="#cb7-109" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span> </span>
+<span id="cb7-110"><a href="#cb7-110" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">y =</span> label_y, <span class="at">label =</span> Christian_Racial_Group), <span class="at">colour =</span> <span class="st">"white"</span>) <span class="sc">+</span> </span>
+<span id="cb7-111"><a href="#cb7-111" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Democratic voters are less religious and more diverse"</span>, </span>
+<span id="cb7-112"><a href="#cb7-112" aria-hidden="true" tabindex="-1"></a>  <span class="at">subtitle =</span> <span class="st">"Breakdown of 2016 presidential election primary voters by religious affiliation and party (and, among Christians, race)"</span>) <span class="sc">+</span> </span>
+<span id="cb7-113"><a href="#cb7-113" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_fivethirtyeight</span>() <span class="sc">+</span> </span>
+<span id="cb7-114"><a href="#cb7-114" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.y =</span> <span class="fu">element_blank</span>(), </span>
+<span id="cb7-115"><a href="#cb7-115" aria-hidden="true" tabindex="-1"></a>        <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"gainsboro"</span>), </span>
+<span id="cb7-116"><a href="#cb7-116" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.background =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"gainsboro"</span>), </span>
+<span id="cb7-117"><a href="#cb7-117" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.position =</span> <span class="st">"none"</span>, <span class="at">axis.ticks =</span> <span class="fu">element_blank</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="visualization_exercise_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+</section>
+<section id="concluding-rationales" class="level1">
+<h1>Concluding Rationales</h1>
+<p>I decided to stop here, as I had already spent about 3-4 hours trying to get as close to the original graph as possible. The most difficult part of the exercise for me had been centering the group name exactly at the center of each “stack” in the bar graph. Through this experience, I have learned that even “professional” graphs can take quite a while to make.</p>
 
 
 
-</main> <!-- /main -->
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
+<div id="ref-ansolabehere2018" class="csl-entry" role="doc-biblioentry">
+Ansolabehere, Stephen, and Brian F. Schaffner. 2018. <span>“CCES Common Content, 2016,”</span> February. <a href="https://doi.org/10.7910/DVN/GDF6Z0">https://doi.org/10.7910/DVN/GDF6Z0</a>.
+</div>
+<div id="ref-thomson-deveaux2019" class="csl-entry" role="doc-biblioentry">
+Thomson-DeVeaux, Amelia. 2019. <span>“Why Democrats Struggle to Mobilize a <span>‘</span>Religious Left<span>’</span>.”</span> <a href="https://fivethirtyeight.com/features/why-democrats-struggle-to-mobilize-a-religious-left/">https://fivethirtyeight.com/features/why-democrats-struggle-to-mobilize-a-religious-left/</a>.
+</div>
+</div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
