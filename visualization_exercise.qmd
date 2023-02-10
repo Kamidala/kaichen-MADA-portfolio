@@ -145,15 +145,23 @@ ggplot(data = proportions_data_specific,
       Hispanic = "darkorange", 
       Black = "orange")) + 
   geom_col() + 
-  geom_text(aes(y = label_y, label = Christian_Racial_Group), colour = "white") + 
+  geom_text(aes(y = label_y, label = Christian_Racial_Group), colour = "white", size = 3) + 
   labs(title = "Democratic voters are less religious and more diverse", 
-  subtitle = "Breakdown of 2016 presidential election primary voters by religious affiliation and party (and, among Christians, race)") + 
+  subtitle = "Breakdown of 2016 presidential election primary voters by religious affiliation and party (and, among Christians, race)") +
   theme_fivethirtyeight() + 
-  theme(axis.text.y = element_blank(), 
+  theme(axis.text.y = element_blank(),
         panel.background = element_rect(fill = "gainsboro"), 
         plot.background = element_rect(fill = "gainsboro"), 
         legend.position = "none", axis.ticks = element_blank())
+
+ggsave("visualization_exercise_result.png", path = "output", width = 3000, height = 2000, units = "px")
 ```
+
+# Monitor Output
+
+As occasionally the visualization changes width/height based on monitor display, I decided to save the result as a PNG file so that the scaling would be the same no matter the resolution of the monitor used to view it. Here is the file below:
+
+![](output/visualization_exercise_result.png){width="100%"}
 
 # Concluding Rationales
 
