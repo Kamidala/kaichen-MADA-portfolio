@@ -173,5 +173,12 @@
     "title": "Tidy Tuesday Exercise",
     "section": "Does Couple Number Impact Age Difference?",
     "text": "Does Couple Number Impact Age Difference?\n\nggplot(data, aes(x = couple_number, y = age_difference, group = couple_number)) + \n  geom_point() + \n  geom_line() + \n  geom_boxplot()\n\n\n\n\nAs we can see from the graph, the lower the couple number, the greater the age difference in general. It is interesting, though, that we see increasing age difference once again for couple numbers 6 and 7."
+  },
+  {
+    "objectID": "tidytuesday_exercise.html#overall-look-at-data",
+    "href": "tidytuesday_exercise.html#overall-look-at-data",
+    "title": "Tidy Tuesday Exercise",
+    "section": "Overall Look at Data",
+    "text": "Overall Look at Data\n\ndata_summary <- do.call(cbind, lapply(data %>% select(\n  Decade_Numeric, release_year, \n  actor_1_age, actor_2_age, \n  age_difference, couple_number), summary))\n\ndata_summary <- data.frame(data_summary)\nrmarkdown::paged_table(data_summary)\n\n\n\n  \n\n\n\nUnfortunately, this feels like a poor view of the data…"
   }
 ]

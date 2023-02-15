@@ -89,6 +89,19 @@ data <- data %>%
 ```
 
 # Data Visualization
+## Overall Look at Data
+```{r}
+data_summary <- do.call(cbind, lapply(data %>% select(
+  Decade_Numeric, release_year, 
+  actor_1_age, actor_2_age, 
+  age_difference, couple_number), summary))
+
+data_summary <- data.frame(data_summary)
+rmarkdown::paged_table(data_summary)
+
+```
+Unfortunately, this feels like a poor view of the data...
+
 ## Does Age Difference Decrease by Year?
 ```{r}
 ggplot(data, aes(x = release_year, y = age_difference)) +
