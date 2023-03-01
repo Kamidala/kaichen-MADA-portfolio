@@ -1,0 +1,106 @@
+---
+title: "Module 8 Exercise - Fitting Basic Statistical Models: Part 3"
+output: 
+  html_document:
+      link-external-icon: TRUE
+      toc: FALSE
+---
+# Load Cleaned Data and Libraries
+```{r}
+# Data Handling and Model Building
+library(tidyverse)
+library(tidymodels)
+library(gtsummary)
+
+# Pathing
+library(here)
+path <- here("fluanalysis", "data", "cleaned_data.rds")
+
+# Load Data
+clean_data <- readRDS(path)
+```
+
+I will recode RunnyNose as 1 if yes and 0 if no so that the statistical models can better handle these variables. I will also do the same for the other predictors. As mentioned in the previous Quarto document, predictors for body temperature are: SwollenLymphNodes, SubjectiveFever, MyalgiaYN, Myalgia, and ChillsSweats. The predictors for nausea are: Headache, EarPn, and Vomit. Nausea and RunnyNose will be added as predictors for body temperature in the multiple linear regression model, and body temperature and RunnyNose will be added as predictors for nausea in the multiple logistic regression model.
+
+# Preparation for Model Fitting - Recoding Variables
+```{r}
+# Keep Recoded Data Separate From Cleaned Data
+recoded_data <- clean_data %>%
+  mutate(RunnyNose = if_else(RunnyNose == "Yes", 1, 0)) %>%
+  ## Predictors for Body Temperature
+  mutate(SwollenLymphNodes = if_else(
+    SwollenLymphNodes == "Yes", 1, 0)) %>%
+  mutate(SubjectiveFever = if_else(
+    SubjectiveFever == "Yes", 1, 0)) %>%
+  mutate(MyalgiaYN = if_else(MyalgiaYN == "Yes", 1, 0)) %>%
+  mutate(Myalgia = case_when(
+    Myalgia == "None" ~ 0,
+    Myalgia == "Mild" ~ 1,
+    Myalgia == "Moderate" ~ 2,
+    Myalgia == "Severe" ~ 3)) %>%
+  mutate(ChillsSweats = if_else(ChillsSweats == "Yes", 1, 0)) %>%
+  mutate(Nausea = if_else(Nausea == "Yes", 1, 0)) %>%
+  mutate(Headache = if_else(Headache == "Yes", 1, 0)) %>%
+  mutate(EarPn = if_else(EarPn == "Yes", 1, 0)) %>%
+  mutate(Vomit = if_else(Vomit == "Yes", 1, 0))
+  
+```
+
+# Linear Regression Model
+## Set Up Linear Regression Engine
+```{r}
+lm_model <- linear_reg() %>% set_engine("lm")
+```
+
+## Runny Nose vs Body Temperature
+```{r}
+# Tidymodels
+tidy(lm_model %>% fit(BodyTemp ~ RunnyNose, data = recoded_data))
+
+# Base R
+summary(lm(BodyTemp ~ RunnyNose, data = recoded_data))
+```
+
+## All Relevant Predictors vs Body Temperature
+```{r}
+# Tidymodels
+rmarkdown::paged_table(tidy(lm_model %>% fit(BodyTemp ~ Nausea + SwollenLymphNodes + SubjectiveFever + MyalgiaYN + Myalgia + ChillsSweats + RunnyNose, data = recoded_data)))
+
+# Base R
+summary(lm(BodyTemp ~ Nausea + SwollenLymphNodes + SubjectiveFever + MyalgiaYN + Myalgia + ChillsSweats + RunnyNose, data = recoded_data))
+```
+
+## Conclusions 
+
+The output of the models is ordinary in that they relay the same primary information of *summary(lm(...))* (for which I had recoded variables) in table form. However, I was unpleasantly surprised by the lack of stars next to p-values. For this reason, I prefer the longer-winded *summary(lm(...))* to tidymodels. I will not deny, though, that there may be some instances where the ability to convert such information into a table would be greatly beneficial. The only difference between the two linear regression models built is that one accounts for the multiple predictors that have been inputted, rather than just one.
+
+# Logistic Model
+
+## Set Up Logistic Regression Engine
+```{r}
+logistic_model <- logistic_reg() %>% set_engine("glm")
+```
+
+## Runny Nose vs Nausea
+```{r}
+# Tidymodels
+tidy(logistic_model %>% fit(Nausea ~ RunnyNose, data = clean_data))
+
+# Base R
+summary(glm(Nausea ~ RunnyNose, family = binomial, data = recoded_data))
+```
+
+## All Relevant Predictors vs Nausea
+```{r}
+# Tidymodels
+rmarkdown::paged_table(tidy(logistic_model %>% fit(Nausea ~ RunnyNose + Headache + EarPn + Vomit + BodyTemp, data = clean_data)))
+
+# Base R
+summary(glm(Nausea ~ RunnyNose + Headache + EarPn + Vomit + BodyTemp, family = binomial, data = recoded_data))
+```
+
+## Conclusions
+
+I reiterate my thoughts from the previous *Conclusions* section under linear regression; I would still prefer manually recoding my variables for a *summary(glm(...))* than use tidymodels, even if model performance between the options offered is the same. However, I have also noticed that *summary()* is not needed for the statistics to be displayed. Instead, that function is already built into *fit()*. Just like the linear regression models, the only difference between the two logistic models built is that one accounts for the multiple predictors that have been inputted, rather than just one.
+
+All in all, while tidymodels would not be my go-to for model fitting, the package has a few functions I would like to keep in mind going forward.

@@ -1,0 +1,61 @@
+---
+title: "Module 8 Exercise - Fitting Basic Statistical Models: Part 1"
+output: 
+  html_document:
+      link-external-icon: TRUE
+      toc: FALSE
+---
+
+# Setup
+
+## Load Required R Packages
+
+Tidyverse will be used for handling data processing/manipulation, and the here() package assists in pathing.
+
+```{r include=FALSE}
+library(tidyverse)
+library(here)
+```
+
+## Load Data
+
+```{r}
+# Pathing
+data_path <- here("fluanalysis", "data", "SympAct_Any_Pos.Rda")
+
+# Data Importation
+raw_data <- readRDS(data_path)
+```
+
+# Data Manipulation
+
+During this stage, unnecessary columns and any NA values will be removed according to the assignment instructions. Column removal will be accomplished through the syntax `select(!contains())`, for this method includes all columns that are not the ones specified in the command. Tidyverse has the command `drop_na()`, permitting the removal of all observations containing any NA values across the dataset.
+
+```{r}
+# Removal of Unnecessary Columns
+clean_data <- raw_data %>%
+  select(!contains(
+    c("Activity", "Score", "FluA", "FluB", "DxName", 
+      "Total", "Unique.Visit")))
+
+rmarkdown::paged_table(clean_data)
+
+# Remove NAs in Dataset
+clean_data <- clean_data %>%
+  drop_na()
+
+rmarkdown::paged_table(clean_data)
+
+```
+
+# Save Cleaned Data
+
+As specified in the assignment instructions, the resulting dataset shall be saved as an RDS file in the *data* folder of *fluanalysis*. This allows for loading of the cleaned data in another Quarto/R script.
+
+```{r}
+# Pathing
+data_path <- here("fluanalysis", "data", "cleaned_data.rds")
+
+# Saving Dataset as RDS
+saveRDS(clean_data, file = data_path)
+```

@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.313">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Data Analysis Portfolio: Kai Chen - Module 8 Exercise - Fitting Basic Statistical Models: Part 2</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+<link href="../../site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
+<script src="../../site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Data Analysis Portfolio: Kai Chen</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../.././aboutme.html">
+ <span class="menu-text">About Me</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-projects" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Projects</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-projects">    
+        <li>
+    <a class="dropdown-item" href="../.././coding_exercise.html">
+ <span class="dropdown-text">R Coding Exercise</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../.././visualization_exercise.html">
+ <span class="dropdown-text">Visualization Exercise</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../.././tidytuesday_exercise.html">
+ <span class="dropdown-text">Tidy Tuesday Exercise</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../.././dataanalysis_exercise.html">
+ <span class="dropdown-text">Module 4: Data Analysis Exercise (Week of 1/30)</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-flu-analysis" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Flu Analysis</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-flu-analysis">    
+        <li>
+    <a class="dropdown-item" href="../.././fluanalysis/code/wrangling.html">
+ <span class="dropdown-text">Wrangling</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../.././fluanalysis/code/exploration.html">
+ <span class="dropdown-text">Exploration</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../.././fluanalysis/code/fitting.html">
+ <span class="dropdown-text">Fitting</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/Kamidala/kaichen-MADA-portfolio"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Module 8 Exercise - Fitting Basic Statistical Models: Part 2</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="setup" class="level1">
+<h1>Setup</h1>
+<p><code>Tidyverse</code> will be used for graphing in addition to handling data processing/manipulation, and the <code>here</code> package assists in pathing. The <code>gtsummary</code> package will be used to create descriptive summary tables.</p>
+<section id="load-required-r-packages" class="level2">
+<h2 class="anchored" data-anchor-id="load-required-r-packages">Load Required R Packages</h2>
+</section>
+<section id="load-cleaned-data" class="level2">
+<h2 class="anchored" data-anchor-id="load-cleaned-data">Load Cleaned Data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Pathing</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>data_path <span class="ot">&lt;-</span> <span class="fu">here</span>(<span class="st">"fluanalysis"</span>, <span class="st">"data"</span>, <span class="st">"cleaned_data.rds"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Data Importation</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>clean_data <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(data_path)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="exploratory-data-analysis" class="level1">
+<h1>Exploratory Data Analysis</h1>
+<p>To get a greater sense of the dataset’s structure, I’ll run the <code>str()</code> command and determine which variables of interest are numeric and/or continuous.</p>
+<section id="data-structure" class="level2">
+<h2 class="anchored" data-anchor-id="data-structure">Data Structure</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(clean_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>'data.frame':   730 obs. of  32 variables:
+ $ SwollenLymphNodes: Factor w/ 2 levels "No","Yes": 2 2 2 2 2 1 1 1 2 1 ...
+  ..- attr(*, "label")= chr "Swollen Lymph Nodes"
+ $ ChestCongestion  : Factor w/ 2 levels "No","Yes": 1 2 2 2 1 1 1 2 2 2 ...
+  ..- attr(*, "label")= chr "Chest Congestion"
+ $ ChillsSweats     : Factor w/ 2 levels "No","Yes": 1 1 2 2 2 2 2 2 2 1 ...
+  ..- attr(*, "label")= chr "Chills/Sweats"
+ $ NasalCongestion  : Factor w/ 2 levels "No","Yes": 1 2 2 2 1 1 1 2 2 2 ...
+  ..- attr(*, "label")= chr "Nasal Congestion"
+ $ CoughYN          : Factor w/ 2 levels "No","Yes": 2 2 1 2 1 2 2 2 2 2 ...
+  ..- attr(*, "label")= chr "Cough"
+ $ Sneeze           : Factor w/ 2 levels "No","Yes": 1 1 2 2 1 2 1 2 1 1 ...
+  ..- attr(*, "label")= chr "Sneeze"
+ $ Fatigue          : Factor w/ 2 levels "No","Yes": 2 2 2 2 2 2 2 2 2 2 ...
+  ..- attr(*, "label")= chr "Fatigue"
+ $ SubjectiveFever  : Factor w/ 2 levels "No","Yes": 2 2 2 2 2 2 2 2 2 1 ...
+  ..- attr(*, "label")= chr "Subjective Fever"
+ $ Headache         : Factor w/ 2 levels "No","Yes": 2 2 2 2 2 2 1 2 2 2 ...
+  ..- attr(*, "label")= chr "Headache"
+ $ Weakness         : Factor w/ 4 levels "None","Mild",..: 2 4 4 4 3 3 2 4 3 3 ...
+ $ WeaknessYN       : Factor w/ 2 levels "No","Yes": 2 2 2 2 2 2 2 2 2 2 ...
+  ..- attr(*, "label")= chr "Weakness"
+ $ CoughIntensity   : Factor w/ 4 levels "None","Mild",..: 4 4 2 3 1 3 4 3 3 3 ...
+  ..- attr(*, "label")= chr "Cough Severity"
+ $ CoughYN2         : Factor w/ 2 levels "No","Yes": 2 2 2 2 1 2 2 2 2 2 ...
+ $ Myalgia          : Factor w/ 4 levels "None","Mild",..: 2 4 4 4 2 3 2 4 3 2 ...
+ $ MyalgiaYN        : Factor w/ 2 levels "No","Yes": 2 2 2 2 2 2 2 2 2 2 ...
+  ..- attr(*, "label")= chr "Myalgia"
+ $ RunnyNose        : Factor w/ 2 levels "No","Yes": 1 1 2 2 1 1 2 2 2 2 ...
+  ..- attr(*, "label")= chr "Runny Nose"
+ $ AbPain           : Factor w/ 2 levels "No","Yes": 1 1 2 1 1 1 1 1 1 1 ...
+  ..- attr(*, "label")= chr "Abdominal Pain"
+ $ ChestPain        : Factor w/ 2 levels "No","Yes": 1 1 2 1 1 2 2 1 1 1 ...
+  ..- attr(*, "label")= chr "Chest Pain"
+ $ Diarrhea         : Factor w/ 2 levels "No","Yes": 1 1 1 1 1 2 1 1 1 1 ...
+ $ EyePn            : Factor w/ 2 levels "No","Yes": 1 1 1 1 2 1 1 1 1 1 ...
+  ..- attr(*, "label")= chr "Eye Pain"
+ $ Insomnia         : Factor w/ 2 levels "No","Yes": 1 1 2 2 2 1 1 2 2 2 ...
+  ..- attr(*, "label")= chr "Sleeplessness"
+ $ ItchyEye         : Factor w/ 2 levels "No","Yes": 1 1 1 1 1 1 1 1 1 1 ...
+  ..- attr(*, "label")= chr "Itchy Eyes"
+ $ Nausea           : Factor w/ 2 levels "No","Yes": 1 1 2 2 2 2 1 1 2 2 ...
+ $ EarPn            : Factor w/ 2 levels "No","Yes": 1 2 1 2 1 1 1 1 1 1 ...
+  ..- attr(*, "label")= chr "Ear Pain"
+ $ Hearing          : Factor w/ 2 levels "No","Yes": 1 2 1 1 1 1 1 1 1 1 ...
+  ..- attr(*, "label")= chr "Loss of Hearing"
+ $ Pharyngitis      : Factor w/ 2 levels "No","Yes": 2 2 2 2 2 2 2 1 1 1 ...
+  ..- attr(*, "label")= chr "Sore Throat"
+ $ Breathless       : Factor w/ 2 levels "No","Yes": 1 1 2 1 1 2 1 1 1 2 ...
+  ..- attr(*, "label")= chr "Breathlessness"
+ $ ToothPn          : Factor w/ 2 levels "No","Yes": 1 1 2 1 1 1 1 1 2 1 ...
+  ..- attr(*, "label")= chr "Tooth Pain"
+ $ Vision           : Factor w/ 2 levels "No","Yes": 1 1 1 1 1 1 1 1 1 1 ...
+  ..- attr(*, "label")= chr "Blurred Vision"
+ $ Vomit            : Factor w/ 2 levels "No","Yes": 1 1 1 1 1 1 2 1 1 1 ...
+  ..- attr(*, "label")= chr "Vomiting"
+ $ Wheeze           : Factor w/ 2 levels "No","Yes": 1 1 1 2 1 2 1 1 1 1 ...
+  ..- attr(*, "label")= chr "Wheezing"
+ $ BodyTemp         : num  98.3 100.4 100.8 98.8 100.5 ...</code></pre>
+</div>
+</div>
+<p>It appears that there is only one numeric/continuous variable: BodyTemp. <strong>BodyTemp</strong> will also serve as the main continuous outcome of interest, and <strong>Nausea</strong> will serve as the main categorical outcome.</p>
+<p>Other important variables of interest (that may be associated with these outcomes) include:</p>
+<ul>
+<li>SwollenLymphNodes</li>
+<li>ChillsSweats</li>
+<li>SubjectiveFever</li>
+<li>Headache</li>
+<li>Myalgia(Y/N)</li>
+<li>EarPn</li>
+<li>Vomit</li>
+</ul>
+<section id="categorical-variables-nausea-swollenlymphnodes-chillssweats-subjectivefever-headache-myalgiayn-myalgia-earpn-vomit" class="level3">
+<h3 class="anchored" data-anchor-id="categorical-variables-nausea-swollenlymphnodes-chillssweats-subjectivefever-headache-myalgiayn-myalgia-earpn-vomit">Categorical Variables: Nausea, SwollenLymphNodes, ChillsSweats, SubjectiveFever, Headache, MyalgiaYN, Myalgia, EarPn, Vomit</h3>
+<p>Since these categorical variables are just Y/N, the number of yes/no’s will be presented in a table for each.</p>
+<p>Nausea - Main Categorical Outcome</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Table</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>(clean_data <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(Nausea) <span class="sc">%&gt;%</span> <span class="fu">count</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Nausea"],"name":[1],"type":["fct"],"align":["left"]},{"label":["n"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"No","2":"475"},{"1":"Yes","2":"255"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>Swollen Lymph Nodes</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>(clean_data <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(SwollenLymphNodes) <span class="sc">%&gt;%</span> <span class="fu">count</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["SwollenLymphNodes"],"name":[1],"type":["fct"],"align":["left"]},{"label":["n"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"No","2":"418"},{"1":"Yes","2":"312"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>Chills/Sweats</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>(clean_data <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(ChillsSweats) <span class="sc">%&gt;%</span> <span class="fu">count</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["ChillsSweats"],"name":[1],"type":["fct"],"align":["left"]},{"label":["n"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"No","2":"130"},{"1":"Yes","2":"600"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>Subjective Fever</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>(clean_data <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(SubjectiveFever) <span class="sc">%&gt;%</span> <span class="fu">count</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["SubjectiveFever"],"name":[1],"type":["fct"],"align":["left"]},{"label":["n"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"No","2":"230"},{"1":"Yes","2":"500"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>Headache</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>(clean_data <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(Headache) <span class="sc">%&gt;%</span> <span class="fu">count</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Headache"],"name":[1],"type":["fct"],"align":["left"]},{"label":["n"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"No","2":"115"},{"1":"Yes","2":"615"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>Myalgia</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Y/N</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>(clean_data <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(MyalgiaYN) <span class="sc">%&gt;%</span> <span class="fu">count</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["MyalgiaYN"],"name":[1],"type":["fct"],"align":["left"]},{"label":["n"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"No","2":"79"},{"1":"Yes","2":"651"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># None, Mild, Moderate, Severe</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>(clean_data <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(Myalgia) <span class="sc">%&gt;%</span> <span class="fu">count</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Myalgia"],"name":[1],"type":["fct"],"align":["left"]},{"label":["n"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"None","2":"79"},{"1":"Mild","2":"213"},{"1":"Moderate","2":"325"},{"1":"Severe","2":"113"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>Ear Pain</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>(clean_data <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(EarPn) <span class="sc">%&gt;%</span> <span class="fu">count</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["EarPn"],"name":[1],"type":["fct"],"align":["left"]},{"label":["n"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"No","2":"568"},{"1":"Yes","2":"162"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>Vomit</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>(clean_data <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(Vomit) <span class="sc">%&gt;%</span> <span class="fu">count</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Vomit"],"name":[1],"type":["fct"],"align":["left"]},{"label":["n"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"No","2":"652"},{"1":"Yes","2":"78"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+</section>
+<section id="continuous-variables-bodytemp" class="level3">
+<h3 class="anchored" data-anchor-id="continuous-variables-bodytemp">Continuous Variables: BodyTemp</h3>
+<p>Body Temperature - Main Continuous Outcome</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Summary Table</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>Body_Temp_Summary <span class="ot">&lt;-</span> <span class="fu">do.call</span>(cbind, <span class="fu">lapply</span>(</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  clean_data <span class="sc">%&gt;%</span> <span class="fu">select</span>(BodyTemp), summary))</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>Body_Temp_Summary <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(Body_Temp_Summary)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>(Body_Temp_Summary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["BodyTemp"],"name":[1],"type":["dbl"],"align":["right"]}],"data":[{"1":"97.20000","_rn_":"Min."},{"1":"98.20000","_rn_":"1st Qu."},{"1":"98.50000","_rn_":"Median"},{"1":"98.93507","_rn_":"Mean"},{"1":"99.30000","_rn_":"3rd Qu."},{"1":"103.10000","_rn_":"Max."}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Histogram</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(clean_data, <span class="fu">aes</span>(<span class="at">x =</span> BodyTemp)) <span class="sc">+</span> </span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Body Temperature"</span>, <span class="at">y =</span> <span class="st">"Frequency"</span>, </span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Frequency of Body Temperatures"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="exploration_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+</section>
+<section id="data-visualization-predictors-and-outcomes" class="level2">
+<h2 class="anchored" data-anchor-id="data-visualization-predictors-and-outcomes">Data Visualization: Predictors and Outcomes</h2>
+<p>Selected Predictors for Outcome of Nausea: Headache, EarPn, Vomit</p>
+<p>Selected Predictors for Outcome of Body Temperature: SwollenLymphNodes, SubjectiveFever, MyalgiaYN, Myalgia, ChillsSweats</p>
+<p>Since it is difficult to represent categorical variables as themselves instead of numeric, I have decided to plot the <strong>Nausea</strong> variable as 0 for “No” and 1 for “Yes” on the y-axis.</p>
+<section id="ear-pain-vs-nausea" class="level3">
+<h3 class="anchored" data-anchor-id="ear-pain-vs-nausea">Ear Pain vs Nausea</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(clean_data <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Nausea =</span> <span class="fu">if_else</span>(Nausea <span class="sc">==</span> <span class="st">"Yes"</span>, <span class="dv">1</span>, <span class="dv">0</span>)), <span class="fu">aes</span>(<span class="at">x =</span> EarPn, <span class="at">y =</span> Nausea)) <span class="sc">+</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>() <span class="sc">+</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_violin</span>() <span class="sc">+</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Ear Pain"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="exploration_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Most do not have ear pain. This violin plot also depicts greater lack of nausea for those who don’t have ear pain. For those that do, the frequency distributions seem relatively similar, though the frequency of “Yes” to ear pain still results in slightly fewer cases of nausea.</p>
+</section>
+<section id="vomit-vs-nausea" class="level3">
+<h3 class="anchored" data-anchor-id="vomit-vs-nausea">Vomit vs Nausea</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(clean_data <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Nausea =</span> <span class="fu">if_else</span>(Nausea <span class="sc">==</span> <span class="st">"Yes"</span>, <span class="dv">1</span>, <span class="dv">0</span>)), <span class="fu">aes</span>(<span class="at">x =</span> Vomit, <span class="at">y =</span> Nausea)) <span class="sc">+</span> </span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>() <span class="sc">+</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_violin</span>() <span class="sc">+</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Vomiting"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="exploration_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Most do not have vomiting. However, the violin plot above shows greater frequency of nausea with vomiting than vice-versa (which makes sense).</p>
+</section>
+<section id="headache-vs-nausea" class="level3">
+<h3 class="anchored" data-anchor-id="headache-vs-nausea">Headache vs Nausea</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(clean_data <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Nausea =</span> <span class="fu">if_else</span>(Nausea <span class="sc">==</span> <span class="st">"Yes"</span>, <span class="dv">1</span>, <span class="dv">0</span>)), <span class="fu">aes</span>(<span class="at">x =</span> Headache, <span class="at">y =</span> Nausea)) <span class="sc">+</span> </span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>() <span class="sc">+</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_violin</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="exploration_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Most have a headache. From the violin graph, it appears that headache may influence nausea, though a statistical test or model should be done to verify this.</p>
+</section>
+<section id="subjective-fever-vs-body-temperature" class="level3">
+<h3 class="anchored" data-anchor-id="subjective-fever-vs-body-temperature">Subjective Fever vs Body Temperature</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(clean_data, <span class="fu">aes</span>(<span class="at">x =</span> SubjectiveFever, <span class="at">y =</span> BodyTemp)) <span class="sc">+</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Subjective Fever"</span>, <span class="at">y =</span> <span class="st">"Body Temperature"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="exploration_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Those who say “Yes” to subjective fever tend to have higher body temperatures than those who say “No”.</p>
+</section>
+<section id="swollen-lymph-nodes-vs-body-temperature" class="level3">
+<h3 class="anchored" data-anchor-id="swollen-lymph-nodes-vs-body-temperature">Swollen Lymph Nodes vs Body Temperature</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(clean_data, <span class="fu">aes</span>(<span class="at">x =</span> SwollenLymphNodes, <span class="at">y =</span> BodyTemp)) <span class="sc">+</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> <span class="fu">geom_boxplot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="exploration_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>There appears to be little difference between the body temperatures of those who do have swollen lymph nodes and those who do not.</p>
+</section>
+<section id="myalgia-vs-body-temperature" class="level3">
+<h3 class="anchored" data-anchor-id="myalgia-vs-body-temperature">Myalgia vs Body Temperature</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Y/N</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(clean_data, <span class="fu">aes</span>(<span class="at">x =</span> MyalgiaYN, <span class="at">y =</span> BodyTemp)) <span class="sc">+</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> <span class="fu">geom_boxplot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="exploration_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Myalgia Severity</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(clean_data, <span class="fu">aes</span>(<span class="at">x =</span> Myalgia, <span class="at">y =</span> BodyTemp)) <span class="sc">+</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> <span class="fu">geom_boxplot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="exploration_files/figure-html/unnamed-chunk-18-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>It seems that there is an association between having myalgia and a higher body temperature.</p>
+</section>
+<section id="chillssweats-vs-body-temperature" class="level3">
+<h3 class="anchored" data-anchor-id="chillssweats-vs-body-temperature">Chills/Sweats vs Body Temperature</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(clean_data, <span class="fu">aes</span>(<span class="at">x =</span> ChillsSweats, <span class="at">y =</span> BodyTemp)) <span class="sc">+</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Chills/Sweats"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="exploration_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>From the boxplot, it appears that those with chills/sweats tend to have higher body temperatures than those without.</p>
+
+
+</section>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
