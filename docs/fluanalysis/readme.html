@@ -155,18 +155,18 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="anchored" data-anchor-id="code">Code</h2>
 <section id="wrangling" class="level3">
 <h3 class="anchored" data-anchor-id="wrangling">Wrangling</h3>
-<p>In the cleaning process, several columns and observations containing NA values are removed. For more information, please view the Quarto/R document.</p>
+<p>In the cleaning process, several columns and observations containing NA values are removed. After cleaning, the list of columns include: SwollenLymphNodes, ChestCongestion, ChillsSweats, NasalCongestion, CoughYN, Sneeze, Fatigue, Subjective Fever, Headache, Weakness, WeaknessYN, CoughIntensity, CoughYN2, Myalgia, MyalgiaYN, RunnyNose, AbPain, ChestPain, Diarrhea, EyePn, Insomnia, ItchyEye, Nausea, EarPn, Hearing, Pharyngitis, Breathless, ToothPn, Vision, Vomit, Wheeze, and BodyTemp. For more information, please view the Quarto/R document.</p>
 </section>
 <section id="exploration" class="level3">
 <h3 class="anchored" data-anchor-id="exploration">Exploration</h3>
-<p>Variables of interest explored through tables, violin graphs, and boxplots include Nausea (main categorical outcome), SwollenLymphNodes, ChillsSweats, SubjectiveFever, Headache, MyalgiaYN, Myalgia, EarPn, Vomit, and BodyTemp (Main Continuous Outcome). For more information, please view the Quarto/R document.</p>
-<p>Predictors for Nausea are:</p>
+<p>Variables of interest explored through tables, violin graphs, and boxplots include (among others) Nausea (main categorical outcome), SwollenLymphNodes, ChillsSweats, SubjectiveFever, Headache, MyalgiaYN, Myalgia, EarPn, Vomit, and BodyTemp (Main Continuous Outcome). For more information, please view the Quarto/R document.</p>
+<p>Predictors of interest for Nausea in exploratory analysis are:</p>
 <ul>
 <li><p>Headache</p></li>
 <li><p>EarPn</p></li>
 <li><p>Vomit</p></li>
 </ul>
-<p>Predictors for BodyTemp are:</p>
+<p>Predictors of interest for BodyTemp in exploratory analysis are:</p>
 <ul>
 <li><p>SwollenLymphNodes</p></li>
 <li><p>SubjectiveFever</p></li>
@@ -177,7 +177,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="model-fitting" class="level3">
 <h3 class="anchored" data-anchor-id="model-fitting">Model Fitting</h3>
-<p>Model fitting was accomplished through the <code>tidymodels</code> package (code saved) and re-evaluated using base R’s <em>glm()</em> and <em>lm()</em> functions (code not saved).</p>
+<p>Model fitting was accomplished through the <code>tidymodels</code> package and re-evaluated using base R’s <em>glm()</em> and <em>lm()</em> functions. BodyTemp acts as the main continuous outcome of interest, and Nausea acts as the main categorical outcome of interest. All other columns from the cleaned dataset will be treated as predictors. For more information, please view the Quarto/R document.</p>
 </section>
 </section>
 <section id="data" class="level2">

@@ -20,31 +20,7 @@ path <- here("fluanalysis", "data", "cleaned_data.rds")
 clean_data <- readRDS(path)
 ```
 
-I will recode RunnyNose as 1 if yes and 0 if no so that the statistical models can better handle these variables. I will also do the same for the other predictors. As mentioned in the previous Quarto document, predictors for body temperature are: SwollenLymphNodes, SubjectiveFever, MyalgiaYN, Myalgia, and ChillsSweats. The predictors for nausea are: Headache, EarPn, and Vomit. Nausea and RunnyNose will be added as predictors for body temperature in the multiple linear regression model, and body temperature and RunnyNose will be added as predictors for nausea in the multiple logistic regression model.
-
-# Preparation for Model Fitting - Recoding Variables
-```{r}
-# Keep Recoded Data Separate From Cleaned Data
-recoded_data <- clean_data %>%
-  mutate(RunnyNose = if_else(RunnyNose == "Yes", 1, 0)) %>%
-  ## Predictors for Body Temperature
-  mutate(SwollenLymphNodes = if_else(
-    SwollenLymphNodes == "Yes", 1, 0)) %>%
-  mutate(SubjectiveFever = if_else(
-    SubjectiveFever == "Yes", 1, 0)) %>%
-  mutate(MyalgiaYN = if_else(MyalgiaYN == "Yes", 1, 0)) %>%
-  mutate(Myalgia = case_when(
-    Myalgia == "None" ~ 0,
-    Myalgia == "Mild" ~ 1,
-    Myalgia == "Moderate" ~ 2,
-    Myalgia == "Severe" ~ 3)) %>%
-  mutate(ChillsSweats = if_else(ChillsSweats == "Yes", 1, 0)) %>%
-  mutate(Nausea = if_else(Nausea == "Yes", 1, 0)) %>%
-  mutate(Headache = if_else(Headache == "Yes", 1, 0)) %>%
-  mutate(EarPn = if_else(EarPn == "Yes", 1, 0)) %>%
-  mutate(Vomit = if_else(Vomit == "Yes", 1, 0))
-  
-```
+As mentioned in previous files, BodyTemp acts as the main continuous outcome of interest, and Nausea acts as the main categorical outcome of interest. For model fitting, all variables other than the outcome in question will be used as predictors. This means that in a logistic regression model for nausea, body temperature will be one of the predictors. Additionally, RunnyNose will be treated as the main predictor in the simple regression models.
 
 # Linear Regression Model
 ## Set Up Linear Regression Engine
@@ -54,25 +30,25 @@ lm_model <- linear_reg() %>% set_engine("lm")
 
 ## Runny Nose vs Body Temperature
 ```{r}
-# Tidymodels
-tidy(lm_model %>% fit(BodyTemp ~ RunnyNose, data = recoded_data))
+# Tidyverse
+tidy(lm_model %>% fit(BodyTemp ~ RunnyNose, data = clean_data))
 
 # Base R
-summary(lm(BodyTemp ~ RunnyNose, data = recoded_data))
+summary(lm(BodyTemp ~ RunnyNose, data = clean_data))
 ```
 
 ## All Relevant Predictors vs Body Temperature
 ```{r}
 # Tidymodels
-rmarkdown::paged_table(tidy(lm_model %>% fit(BodyTemp ~ Nausea + SwollenLymphNodes + SubjectiveFever + MyalgiaYN + Myalgia + ChillsSweats + RunnyNose, data = recoded_data)))
+rmarkdown::paged_table(tidy(lm_model %>% fit(BodyTemp ~ SwollenLymphNodes + ChestCongestion + ChillsSweats + NasalCongestion + CoughYN + Sneeze + Fatigue + SubjectiveFever + Headache + Weakness + WeaknessYN + CoughIntensity + CoughYN2 + Myalgia + MyalgiaYN + RunnyNose + AbPain + ChestPain + Diarrhea + EyePn + Insomnia + ItchyEye + Nausea + EarPn + Hearing + Pharyngitis + Breathless + ToothPn + Vision + Vomit + Wheeze, data = clean_data)))
 
 # Base R
-summary(lm(BodyTemp ~ Nausea + SwollenLymphNodes + SubjectiveFever + MyalgiaYN + Myalgia + ChillsSweats + RunnyNose, data = recoded_data))
+summary(lm(BodyTemp ~ SwollenLymphNodes + ChestCongestion + ChillsSweats + NasalCongestion + CoughYN + Sneeze + Fatigue + SubjectiveFever + Headache + Weakness + WeaknessYN + CoughIntensity + CoughYN2 + Myalgia + MyalgiaYN + RunnyNose + AbPain + ChestPain + Diarrhea + EyePn + Insomnia + ItchyEye + Nausea + EarPn + Hearing + Pharyngitis + Breathless + ToothPn + Vision + Vomit + Wheeze, data = clean_data))
 ```
 
 ## Conclusions 
 
-The output of the models is ordinary in that they relay the same primary information of *summary(lm(...))* (for which I had recoded variables) in table form. However, I was unpleasantly surprised by the lack of stars next to p-values. For this reason, I prefer the longer-winded *summary(lm(...))* to tidymodels. I will not deny, though, that there may be some instances where the ability to convert such information into a table would be greatly beneficial. The only difference between the two linear regression models built is that one accounts for the multiple predictors that have been inputted, rather than just one.
+The output of the models is ordinary in that they relay the same primary information of *summary(lm(...))* in table form. However, I was unpleasantly surprised by the lack of stars next to p-values. For this reason, I prefer the longer-winded *summary(lm(...))* to tidymodels. I will not deny, though, that there may be some instances where the ability to convert such information into a table would be greatly beneficial. The only difference between the two linear regression models built is that one accounts for the multiple predictors that have been inputted, rather than just one.
 
 # Logistic Model
 
@@ -87,16 +63,16 @@ logistic_model <- logistic_reg() %>% set_engine("glm")
 tidy(logistic_model %>% fit(Nausea ~ RunnyNose, data = clean_data))
 
 # Base R
-summary(glm(Nausea ~ RunnyNose, family = binomial, data = recoded_data))
+summary(glm(Nausea ~ RunnyNose, family = binomial, data = clean_data))
 ```
 
 ## All Relevant Predictors vs Nausea
 ```{r}
 # Tidymodels
-rmarkdown::paged_table(tidy(logistic_model %>% fit(Nausea ~ RunnyNose + Headache + EarPn + Vomit + BodyTemp, data = clean_data)))
+rmarkdown::paged_table(tidy(logistic_model %>% fit(Nausea ~ SwollenLymphNodes + ChestCongestion + ChillsSweats + NasalCongestion + CoughYN + Sneeze + Fatigue + SubjectiveFever + Headache + Weakness + WeaknessYN + CoughIntensity + CoughYN2 + Myalgia + MyalgiaYN + RunnyNose + AbPain + ChestPain + Diarrhea + EyePn + Insomnia + ItchyEye + EarPn + Hearing + Pharyngitis + Breathless + ToothPn + Vision + Vomit + Wheeze + BodyTemp, data = clean_data)))
 
 # Base R
-summary(glm(Nausea ~ RunnyNose + Headache + EarPn + Vomit + BodyTemp, family = binomial, data = recoded_data))
+summary(glm(Nausea ~ SwollenLymphNodes + ChestCongestion + ChillsSweats + NasalCongestion + CoughYN + Sneeze + Fatigue + SubjectiveFever + Headache + Weakness + WeaknessYN + CoughIntensity + CoughYN2 + Myalgia + MyalgiaYN + RunnyNose + AbPain + ChestPain + Diarrhea + EyePn + Insomnia + ItchyEye + EarPn + Hearing + Pharyngitis + Breathless + ToothPn + Vision + Vomit + Wheeze + BodyTemp, family = binomial, data = clean_data))
 ```
 
 ## Conclusions

@@ -8,7 +8,7 @@ output:
 
 # Setup
 
-`Tidyverse` will be used for graphing in addition to handling data processing/manipulation, and the `here` package assists in pathing. The `gtsummary` package will be used to create descriptive summary tables.
+`Tidyverse` will be used for graphing in addition to handling data processing/manipulation, and the `here` package assists in pathing.
 
 ## Load Required R Packages
 
@@ -45,66 +45,112 @@ str(clean_data)
 
 It appears that there is only one numeric/continuous variable: BodyTemp. **BodyTemp** will also serve as the main continuous outcome of interest, and **Nausea** will serve as the main categorical outcome.
 
-Other important variables of interest (that may be associated with these outcomes) include:
+### Categorical Variables
 
--   SwollenLymphNodes
--   ChillsSweats
--   SubjectiveFever
--   Headache
--   Myalgia(Y/N)
--   EarPn
--   Vomit
-
-### Categorical Variables: Nausea, SwollenLymphNodes, ChillsSweats, SubjectiveFever, Headache, MyalgiaYN, Myalgia, EarPn, Vomit
+Categorical variables include: SwollenLymphNodes, ChestCongestion, ChillsSweats, NasalCongestion, CoughYN, Sneeze, Fatigue, Subjective Fever, Headache, Weakness, WeaknessYN, CoughIntensity, CoughYN2, Myalgia, MyalgiaYN, RunnyNose, AbPain, ChestPain, Diarrhea, EyePn, Insomnia, ItchyEye, Nausea, EarPn, Hearing, Pharyngitis, Breathless, ToothPn, Vision, Vomit, and Wheeze.
 
 Since these categorical variables are just Y/N, the number of yes/no's will be presented in a table for each.
 
-Nausea - Main Categorical Outcome
+Main Categorical Outcome - Nausea
 ```{r}
 # Table
 rmarkdown::paged_table(clean_data %>% group_by(Nausea) %>% count())
 ```
 
-Swollen Lymph Nodes
+Other Categorical Variables (Predictors)
 ```{r}
+# Swollen Lymph Nodes
 rmarkdown::paged_table(clean_data %>% group_by(SwollenLymphNodes) %>% count())
-```
 
-Chills/Sweats
-```{r}
+# Chest Congestion and Chest Pain
+## Congestion
+rmarkdown::paged_table(clean_data %>% group_by(ChestCongestion) %>% count())
+## Pain
+rmarkdown::paged_table(clean_data %>% group_by(ChestPain) %>% count())
+
+# Chills/Sweats
 rmarkdown::paged_table(clean_data %>% group_by(ChillsSweats) %>% count())
-```
 
-Subjective Fever
-```{r}
+# Nasal Congestion
+rmarkdown::paged_table(clean_data %>% group_by(NasalCongestion) %>% count())
+
+# Coughing
+## Y/N
+rmarkdown::paged_table(clean_data %>% group_by(CoughYN) %>% count())
+## Intensity
+rmarkdown::paged_table(clean_data %>% group_by(CoughIntensity) %>% count())
+## 2nd Y/N
+rmarkdown::paged_table(clean_data %>% group_by(CoughYN2) %>% count())
+
+# Sneezing
+rmarkdown::paged_table(clean_data %>% group_by(Sneeze) %>% count())
+
+# Fatigue
+rmarkdown::paged_table(clean_data %>% group_by(Fatigue) %>% count())
+
+# Subjective Fever
 rmarkdown::paged_table(clean_data %>% group_by(SubjectiveFever) %>% count())
-```
 
-Headache
-```{r}
+# Headache
 rmarkdown::paged_table(clean_data %>% group_by(Headache) %>% count())
-```
 
-Myalgia
-```{r}
-# Y/N
+# Weakness
+## Severity
+rmarkdown::paged_table(clean_data %>% group_by(Weakness) %>% count())
+## Y/N
+rmarkdown::paged_table(clean_data %>% group_by(WeaknessYN) %>% count())
+
+# Myalgia
+## Y/N
 rmarkdown::paged_table(clean_data %>% group_by(MyalgiaYN) %>% count())
-
-# None, Mild, Moderate, Severe
+## Severity
 rmarkdown::paged_table(clean_data %>% group_by(Myalgia) %>% count())
-```
 
-Ear Pain
-```{r}
+# Runny Nose
+rmarkdown::paged_table(clean_data %>% group_by(RunnyNose) %>% count())
+
+# Abdominal Pain
+rmarkdown::paged_table(clean_data %>% group_by(AbPain) %>% count())
+
+# Diarrhea
+rmarkdown::paged_table(clean_data %>% group_by(Diarrhea) %>% count())
+
+# Eye/Vision
+## Pain
+rmarkdown::paged_table(clean_data %>% group_by(EyePn) %>% count())
+## Itchyness
+rmarkdown::paged_table(clean_data %>% group_by(ItchyEye) %>% count())
+## Vision
+rmarkdown::paged_table(clean_data %>% group_by(Vision) %>% count())
+
+# Insomnia
+rmarkdown::paged_table(clean_data %>% group_by(Insomnia) %>% count())
+
+# Ear/Hearing
+## Pain
 rmarkdown::paged_table(clean_data %>% group_by(EarPn) %>% count())
-```
+## Hearing
+rmarkdown::paged_table(clean_data %>% group_by(Hearing) %>% count())
 
-Vomit
-```{r}
+# Pharyngitis
+rmarkdown::paged_table(clean_data %>% group_by(Pharyngitis) %>% count())
+
+# Breathless/Wheezing
+## Breathless
+rmarkdown::paged_table(clean_data %>% group_by(Breathless) %>% count())
+## Wheezing
+rmarkdown::paged_table(clean_data %>% group_by(Wheeze) %>% count())
+
+# Tooth Pain
+rmarkdown::paged_table(clean_data %>% group_by(ToothPn) %>% count())
+
+# Vomiting
 rmarkdown::paged_table(clean_data %>% group_by(Vomit) %>% count())
 ```
 
-### Continuous Variables: BodyTemp
+### Continuous Variables
+
+The only continuous variable is body temperature, which also acts as the main continuous outcome of interest.
 
 Body Temperature - Main Continuous Outcome
 ```{r}
@@ -123,9 +169,9 @@ ggplot(clean_data, aes(x = BodyTemp)) +
 
 ## Data Visualization: Predictors and Outcomes
 
-Selected Predictors for Outcome of Nausea: Headache, EarPn, Vomit 
+Selected Predictors of Interest for Outcome of Nausea: Headache, EarPn, Vomit 
 
-Selected Predictors for Outcome of Body Temperature: SwollenLymphNodes, SubjectiveFever, MyalgiaYN, Myalgia, ChillsSweats
+Selected Predictors of Interest for Outcome of Body Temperature: SwollenLymphNodes, SubjectiveFever, MyalgiaYN, Myalgia, ChillsSweats
 
 Since it is difficult to represent categorical variables as themselves instead of numeric, I have decided to plot the **Nausea** variable as 0 for "No" and 1 for "Yes" on the y-axis.
 

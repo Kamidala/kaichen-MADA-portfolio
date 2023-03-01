@@ -264,8 +264,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gtsummary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>#BlackLivesMatter
-
+<pre><code>
 Attaching package: 'gtsummary'
 
 The following objects are masked from 'package:recipes':
@@ -282,67 +281,43 @@ The following objects are masked from 'package:recipes':
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Load Data</span></span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>clean_data <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(path)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>I will recode RunnyNose as 1 if yes and 0 if no so that the statistical models can better handle these variables. I will also do the same for the other predictors. As mentioned in the previous Quarto document, predictors for body temperature are: SwollenLymphNodes, SubjectiveFever, MyalgiaYN, Myalgia, and ChillsSweats. The predictors for nausea are: Headache, EarPn, and Vomit. Nausea and RunnyNose will be added as predictors for body temperature in the multiple linear regression model, and body temperature and RunnyNose will be added as predictors for nausea in the multiple logistic regression model.</p>
-</section>
-<section id="preparation-for-model-fitting---recoding-variables" class="level1">
-<h1>Preparation for Model Fitting - Recoding Variables</h1>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Keep Recoded Data Separate From Cleaned Data</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>recoded_data <span class="ot">&lt;-</span> clean_data <span class="sc">%&gt;%</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">RunnyNose =</span> <span class="fu">if_else</span>(RunnyNose <span class="sc">==</span> <span class="st">"Yes"</span>, <span class="dv">1</span>, <span class="dv">0</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="do">## Predictors for Body Temperature</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">SwollenLymphNodes =</span> <span class="fu">if_else</span>(</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    SwollenLymphNodes <span class="sc">==</span> <span class="st">"Yes"</span>, <span class="dv">1</span>, <span class="dv">0</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">SubjectiveFever =</span> <span class="fu">if_else</span>(</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    SubjectiveFever <span class="sc">==</span> <span class="st">"Yes"</span>, <span class="dv">1</span>, <span class="dv">0</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">MyalgiaYN =</span> <span class="fu">if_else</span>(MyalgiaYN <span class="sc">==</span> <span class="st">"Yes"</span>, <span class="dv">1</span>, <span class="dv">0</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Myalgia =</span> <span class="fu">case_when</span>(</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    Myalgia <span class="sc">==</span> <span class="st">"None"</span> <span class="sc">~</span> <span class="dv">0</span>,</span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    Myalgia <span class="sc">==</span> <span class="st">"Mild"</span> <span class="sc">~</span> <span class="dv">1</span>,</span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    Myalgia <span class="sc">==</span> <span class="st">"Moderate"</span> <span class="sc">~</span> <span class="dv">2</span>,</span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    Myalgia <span class="sc">==</span> <span class="st">"Severe"</span> <span class="sc">~</span> <span class="dv">3</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ChillsSweats =</span> <span class="fu">if_else</span>(ChillsSweats <span class="sc">==</span> <span class="st">"Yes"</span>, <span class="dv">1</span>, <span class="dv">0</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Nausea =</span> <span class="fu">if_else</span>(Nausea <span class="sc">==</span> <span class="st">"Yes"</span>, <span class="dv">1</span>, <span class="dv">0</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Headache =</span> <span class="fu">if_else</span>(Headache <span class="sc">==</span> <span class="st">"Yes"</span>, <span class="dv">1</span>, <span class="dv">0</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">EarPn =</span> <span class="fu">if_else</span>(EarPn <span class="sc">==</span> <span class="st">"Yes"</span>, <span class="dv">1</span>, <span class="dv">0</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Vomit =</span> <span class="fu">if_else</span>(Vomit <span class="sc">==</span> <span class="st">"Yes"</span>, <span class="dv">1</span>, <span class="dv">0</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
+<p>As mentioned in previous files, BodyTemp acts as the main continuous outcome of interest, and Nausea acts as the main categorical outcome of interest. For model fitting, all variables other than the outcome in question will be used as predictors. This means that in a logistic regression model for nausea, body temperature will be one of the predictors. Additionally, RunnyNose will be treated as the main predictor in the simple regression models.</p>
 </section>
 <section id="linear-regression-model" class="level1">
 <h1>Linear Regression Model</h1>
 <section id="set-up-linear-regression-engine" class="level2">
 <h2 class="anchored" data-anchor-id="set-up-linear-regression-engine">Set Up Linear Regression Engine</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>lm_model <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>() <span class="sc">%&gt;%</span> <span class="fu">set_engine</span>(<span class="st">"lm"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>lm_model <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>() <span class="sc">%&gt;%</span> <span class="fu">set_engine</span>(<span class="st">"lm"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="runny-nose-vs-body-temperature" class="level2">
 <h2 class="anchored" data-anchor-id="runny-nose-vs-body-temperature">Runny Nose vs Body Temperature</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tidymodels</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(lm_model <span class="sc">%&gt;%</span> <span class="fu">fit</span>(BodyTemp <span class="sc">~</span> RunnyNose, <span class="at">data =</span> recoded_data))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tidyverse</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(lm_model <span class="sc">%&gt;%</span> <span class="fu">fit</span>(BodyTemp <span class="sc">~</span> RunnyNose, <span class="at">data =</span> clean_data))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 2 × 5
-  term        estimate std.error statistic p.value
-  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
-1 (Intercept)   99.1      0.0819   1210.   0      
-2 RunnyNose     -0.293    0.0971     -3.01 0.00268</code></pre>
+  term         estimate std.error statistic p.value
+  &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+1 (Intercept)    99.1      0.0819   1210.   0      
+2 RunnyNoseYes   -0.293    0.0971     -3.01 0.00268</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Base R</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(BodyTemp <span class="sc">~</span> RunnyNose, <span class="at">data =</span> recoded_data))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Base R</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(BodyTemp <span class="sc">~</span> RunnyNose, <span class="at">data =</span> clean_data))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
-lm(formula = BodyTemp ~ RunnyNose, data = recoded_data)
+lm(formula = BodyTemp ~ RunnyNose, data = clean_data)
 
 Residuals:
     Min      1Q  Median      3Q     Max 
 -1.9431 -0.7505 -0.3505  0.3495  4.1495 
 
 Coefficients:
-            Estimate Std. Error  t value Pr(&gt;|t|)    
-(Intercept) 99.14313    0.08191 1210.426  &lt; 2e-16 ***
-RunnyNose   -0.29265    0.09714   -3.013  0.00268 ** 
+             Estimate Std. Error  t value Pr(&gt;|t|)    
+(Intercept)  99.14313    0.08191 1210.426  &lt; 2e-16 ***
+RunnyNoseYes -0.29265    0.09714   -3.013  0.00268 ** 
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
@@ -355,50 +330,85 @@ F-statistic: 9.076 on 1 and 728 DF,  p-value: 0.00268</code></pre>
 <section id="all-relevant-predictors-vs-body-temperature" class="level2">
 <h2 class="anchored" data-anchor-id="all-relevant-predictors-vs-body-temperature">All Relevant Predictors vs Body Temperature</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tidymodels</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>(<span class="fu">tidy</span>(lm_model <span class="sc">%&gt;%</span> <span class="fu">fit</span>(BodyTemp <span class="sc">~</span> Nausea <span class="sc">+</span> SwollenLymphNodes <span class="sc">+</span> SubjectiveFever <span class="sc">+</span> MyalgiaYN <span class="sc">+</span> Myalgia <span class="sc">+</span> ChillsSweats <span class="sc">+</span> RunnyNose, <span class="at">data =</span> recoded_data)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tidymodels</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>(<span class="fu">tidy</span>(lm_model <span class="sc">%&gt;%</span> <span class="fu">fit</span>(BodyTemp <span class="sc">~</span> SwollenLymphNodes <span class="sc">+</span> ChestCongestion <span class="sc">+</span> ChillsSweats <span class="sc">+</span> NasalCongestion <span class="sc">+</span> CoughYN <span class="sc">+</span> Sneeze <span class="sc">+</span> Fatigue <span class="sc">+</span> SubjectiveFever <span class="sc">+</span> Headache <span class="sc">+</span> Weakness <span class="sc">+</span> WeaknessYN <span class="sc">+</span> CoughIntensity <span class="sc">+</span> CoughYN2 <span class="sc">+</span> Myalgia <span class="sc">+</span> MyalgiaYN <span class="sc">+</span> RunnyNose <span class="sc">+</span> AbPain <span class="sc">+</span> ChestPain <span class="sc">+</span> Diarrhea <span class="sc">+</span> EyePn <span class="sc">+</span> Insomnia <span class="sc">+</span> ItchyEye <span class="sc">+</span> Nausea <span class="sc">+</span> EarPn <span class="sc">+</span> Hearing <span class="sc">+</span> Pharyngitis <span class="sc">+</span> Breathless <span class="sc">+</span> ToothPn <span class="sc">+</span> Vision <span class="sc">+</span> Vomit <span class="sc">+</span> Wheeze, <span class="at">data =</span> clean_data)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":["term"],"name":[1],"type":["chr"],"align":["left"]},{"label":["estimate"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["std.error"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["statistic"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["p.value"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"(Intercept)","2":"98.58906591","3":"0.16392639","4":"601.4227754","5":"0.000000e+00"},{"1":"Nausea","2":"0.01786996","3":"0.09281927","4":"0.1925242","5":"8.473857e-01"},{"1":"SwollenLymphNodes","2":"-0.09387439","3":"0.08788940","4":"-1.0680969","5":"2.858338e-01"},{"1":"SubjectiveFever","2":"0.47496078","3":"0.10145810","4":"4.6813491","5":"3.404169e-06"},{"1":"MyalgiaYN","2":"0.21952261","3":"0.18649744","4":"1.1770811","5":"2.395510e-01"},{"1":"Myalgia","2":"-0.05079317","3":"0.06862978","4":"-0.7401039","5":"4.594775e-01"},{"1":"ChillsSweats","2":"0.18621917","3":"0.12592159","4":"1.4788501","5":"1.396165e-01"},{"1":"RunnyNose","2":"-0.29625021","3":"0.09532981","4":"-3.1076345","5":"1.959876e-03"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["term"],"name":[1],"type":["chr"],"align":["left"]},{"label":["estimate"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["std.error"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["statistic"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["p.value"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"(Intercept)","2":"97.925243382","3":"0.30380427","4":"322.33003938","5":"0.0000000000"},{"1":"SwollenLymphNodesYes","2":"-0.165301651","3":"0.09195919","4":"-1.79755436","5":"0.0726816152"},{"1":"ChestCongestionYes","2":"0.087326437","3":"0.09754609","4":"0.89523256","5":"0.3709727231"},{"1":"ChillsSweatsYes","2":"0.201265704","3":"0.12730160","4":"1.58101478","5":"0.1143296215"},{"1":"NasalCongestionYes","2":"-0.215771061","3":"0.11379778","4":"-1.89609202","5":"0.0583623862"},{"1":"CoughYNYes","2":"0.313893444","3":"0.24073841","4":"1.30387770","5":"0.1927069787"},{"1":"SneezeYes","2":"-0.361923733","3":"0.09829872","4":"-3.68187638","5":"0.0002494793"},{"1":"FatigueYes","2":"0.264762040","3":"0.16055756","4":"1.64901633","5":"0.0995961887"},{"1":"SubjectiveFeverYes","2":"0.436837204","3":"0.10339815","4":"4.22480660","5":"0.0000271017"},{"1":"HeadacheYes","2":"0.011453330","3":"0.12540521","4":"0.09133057","5":"0.9272562413"},{"1":"WeaknessMild","2":"0.018229288","3":"0.18916903","4":"0.09636508","5":"0.9232584068"},{"1":"WeaknessModerate","2":"0.098944127","3":"0.19786354","4":"0.50006245","5":"0.6171893927"},{"1":"WeaknessSevere","2":"0.373435367","3":"0.23076647","4":"1.61823925","5":"0.1060647513"},{"1":"WeaknessYNYes","2":"NA","3":"NA","4":"NA","5":"NA"},{"1":"CoughIntensityMild","2":"0.084881121","3":"0.27987795","4":"0.30327906","5":"0.7617679664"},{"1":"CoughIntensityModerate","2":"-0.061383678","3":"0.30199663","4":"-0.20325948","5":"0.8389917201"},{"1":"CoughIntensitySevere","2":"-0.037271960","3":"0.31401273","4":"-0.11869570","5":"0.9055507446"},{"1":"CoughYN2Yes","2":"NA","3":"NA","4":"NA","5":"NA"},{"1":"MyalgiaMild","2":"0.164242082","3":"0.16049835","4":"1.02332566","5":"0.3065099480"},{"1":"MyalgiaModerate","2":"-0.024064157","3":"0.16783366","4":"-0.14338099","5":"0.8860308542"},{"1":"MyalgiaSevere","2":"-0.129263146","3":"0.20785418","4":"-0.62189343","5":"0.5342158930"},{"1":"MyalgiaYNYes","2":"NA","3":"NA","4":"NA","5":"NA"},{"1":"RunnyNoseYes","2":"-0.080485107","3":"0.10852622","4":"-0.74161898","5":"0.4585687450"},{"1":"AbPainYes","2":"0.031574409","3":"0.14023573","4":"0.22515239","5":"0.8219269120"},{"1":"ChestPainYes","2":"0.105070599","3":"0.10697968","4":"0.98215475","5":"0.3263653883"},{"1":"DiarrheaYes","2":"-0.156806439","3":"0.12954510","4":"-1.21043901","5":"0.2265219701"},{"1":"EyePnYes","2":"0.131543593","3":"0.12975729","4":"1.01376651","5":"0.3110469676"},{"1":"InsomniaYes","2":"-0.006823742","3":"0.09079656","4":"-0.07515419","5":"0.9401136613"},{"1":"ItchyEyeYes","2":"-0.008016057","3":"0.11019094","4":"-0.07274697","5":"0.9420284008"},{"1":"NauseaYes","2":"-0.034065530","3":"0.10204921","4":"-0.33381475","5":"0.7386200481"},{"1":"EarPnYes","2":"0.093789944","3":"0.11387468","4":"0.82362418","5":"0.4104356667"},{"1":"HearingYes","2":"0.232202504","3":"0.22204279","4":"1.04575567","5":"0.2960374207"},{"1":"PharyngitisYes","2":"0.317580508","3":"0.12134158","4":"2.61724391","5":"0.0090571085"},{"1":"BreathlessYes","2":"0.090525739","3":"0.09983749","4":"0.90673092","5":"0.3648633668"},{"1":"ToothPnYes","2":"-0.022876171","3":"0.11375044","4":"-0.20110841","5":"0.8406726464"},{"1":"VisionYes","2":"-0.274625068","3":"0.27768100","4":"-0.98899482","5":"0.3230098602"},{"1":"VomitYes","2":"0.165272247","3":"0.15143229","4":"1.09139366","5":"0.2754779067"},{"1":"WheezeYes","2":"-0.046664903","3":"0.10703562","4":"-0.43597548","5":"0.6629899062"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Base R</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(BodyTemp <span class="sc">~</span> Nausea <span class="sc">+</span> SwollenLymphNodes <span class="sc">+</span> SubjectiveFever <span class="sc">+</span> MyalgiaYN <span class="sc">+</span> Myalgia <span class="sc">+</span> ChillsSweats <span class="sc">+</span> RunnyNose, <span class="at">data =</span> recoded_data))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Base R</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(BodyTemp <span class="sc">~</span> SwollenLymphNodes <span class="sc">+</span> ChestCongestion <span class="sc">+</span> ChillsSweats <span class="sc">+</span> NasalCongestion <span class="sc">+</span> CoughYN <span class="sc">+</span> Sneeze <span class="sc">+</span> Fatigue <span class="sc">+</span> SubjectiveFever <span class="sc">+</span> Headache <span class="sc">+</span> Weakness <span class="sc">+</span> WeaknessYN <span class="sc">+</span> CoughIntensity <span class="sc">+</span> CoughYN2 <span class="sc">+</span> Myalgia <span class="sc">+</span> MyalgiaYN <span class="sc">+</span> RunnyNose <span class="sc">+</span> AbPain <span class="sc">+</span> ChestPain <span class="sc">+</span> Diarrhea <span class="sc">+</span> EyePn <span class="sc">+</span> Insomnia <span class="sc">+</span> ItchyEye <span class="sc">+</span> Nausea <span class="sc">+</span> EarPn <span class="sc">+</span> Hearing <span class="sc">+</span> Pharyngitis <span class="sc">+</span> Breathless <span class="sc">+</span> ToothPn <span class="sc">+</span> Vision <span class="sc">+</span> Vomit <span class="sc">+</span> Wheeze, <span class="at">data =</span> clean_data))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
-lm(formula = BodyTemp ~ Nausea + SwollenLymphNodes + SubjectiveFever + 
-    MyalgiaYN + Myalgia + ChillsSweats + RunnyNose, data = recoded_data)
+lm(formula = BodyTemp ~ SwollenLymphNodes + ChestCongestion + 
+    ChillsSweats + NasalCongestion + CoughYN + Sneeze + Fatigue + 
+    SubjectiveFever + Headache + Weakness + WeaknessYN + CoughIntensity + 
+    CoughYN2 + Myalgia + MyalgiaYN + RunnyNose + AbPain + ChestPain + 
+    Diarrhea + EyePn + Insomnia + ItchyEye + Nausea + EarPn + 
+    Hearing + Pharyngitis + Breathless + ToothPn + Vision + Vomit + 
+    Wheeze, data = clean_data)
 
 Residuals:
     Min      1Q  Median      3Q     Max 
--1.7682 -0.7334 -0.3390  0.3266  4.3852 
+-2.2110 -0.7219 -0.2853  0.4342  4.2095 
 
-Coefficients:
-                  Estimate Std. Error t value Pr(&gt;|t|)    
-(Intercept)       98.58907    0.16393 601.423  &lt; 2e-16 ***
-Nausea             0.01787    0.09282   0.193  0.84739    
-SwollenLymphNodes -0.09387    0.08789  -1.068  0.28583    
-SubjectiveFever    0.47496    0.10146   4.681  3.4e-06 ***
-MyalgiaYN          0.21952    0.18650   1.177  0.23955    
-Myalgia           -0.05079    0.06863  -0.740  0.45948    
-ChillsSweats       0.18622    0.12592   1.479  0.13962    
-RunnyNose         -0.29625    0.09533  -3.108  0.00196 ** 
+Coefficients: (3 not defined because of singularities)
+                        Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)            97.925243   0.303804 322.330  &lt; 2e-16 ***
+SwollenLymphNodesYes   -0.165302   0.091959  -1.798 0.072682 .  
+ChestCongestionYes      0.087326   0.097546   0.895 0.370973    
+ChillsSweatsYes         0.201266   0.127302   1.581 0.114330    
+NasalCongestionYes     -0.215771   0.113798  -1.896 0.058362 .  
+CoughYNYes              0.313893   0.240738   1.304 0.192707    
+SneezeYes              -0.361924   0.098299  -3.682 0.000249 ***
+FatigueYes              0.264762   0.160558   1.649 0.099596 .  
+SubjectiveFeverYes      0.436837   0.103398   4.225 2.71e-05 ***
+HeadacheYes             0.011453   0.125405   0.091 0.927256    
+WeaknessMild            0.018229   0.189169   0.096 0.923258    
+WeaknessModerate        0.098944   0.197864   0.500 0.617189    
+WeaknessSevere          0.373435   0.230766   1.618 0.106065    
+WeaknessYNYes                 NA         NA      NA       NA    
+CoughIntensityMild      0.084881   0.279878   0.303 0.761768    
+CoughIntensityModerate -0.061384   0.301997  -0.203 0.838992    
+CoughIntensitySevere   -0.037272   0.314013  -0.119 0.905551    
+CoughYN2Yes                   NA         NA      NA       NA    
+MyalgiaMild             0.164242   0.160498   1.023 0.306510    
+MyalgiaModerate        -0.024064   0.167834  -0.143 0.886031    
+MyalgiaSevere          -0.129263   0.207854  -0.622 0.534216    
+MyalgiaYNYes                  NA         NA      NA       NA    
+RunnyNoseYes           -0.080485   0.108526  -0.742 0.458569    
+AbPainYes               0.031574   0.140236   0.225 0.821927    
+ChestPainYes            0.105071   0.106980   0.982 0.326365    
+DiarrheaYes            -0.156806   0.129545  -1.210 0.226522    
+EyePnYes                0.131544   0.129757   1.014 0.311047    
+InsomniaYes            -0.006824   0.090797  -0.075 0.940114    
+ItchyEyeYes            -0.008016   0.110191  -0.073 0.942028    
+NauseaYes              -0.034066   0.102049  -0.334 0.738620    
+EarPnYes                0.093790   0.113875   0.824 0.410436    
+HearingYes              0.232203   0.222043   1.046 0.296037    
+PharyngitisYes          0.317581   0.121342   2.617 0.009057 ** 
+BreathlessYes           0.090526   0.099837   0.907 0.364863    
+ToothPnYes             -0.022876   0.113750  -0.201 0.840673    
+VisionYes              -0.274625   0.277681  -0.989 0.323010    
+VomitYes                0.165272   0.151432   1.091 0.275478    
+WheezeYes              -0.046665   0.107036  -0.436 0.662990    
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-Residual standard error: 1.164 on 722 degrees of freedom
-Multiple R-squared:  0.06182,   Adjusted R-squared:  0.05272 
-F-statistic: 6.796 on 7 and 722 DF,  p-value: 7.89e-08</code></pre>
+Residual standard error: 1.144 on 695 degrees of freedom
+Multiple R-squared:  0.1287,    Adjusted R-squared:  0.08605 
+F-statistic: 3.019 on 34 and 695 DF,  p-value: 4.197e-08</code></pre>
 </div>
 </div>
 </section>
 <section id="conclusions" class="level2">
 <h2 class="anchored" data-anchor-id="conclusions">Conclusions</h2>
-<p>The output of the models is ordinary in that they relay the same primary information of <em>summary(lm(…))</em> (for which I had recoded variables) in table form. However, I was unpleasantly surprised by the lack of stars next to p-values. For this reason, I prefer the longer-winded <em>summary(lm(…))</em> to tidymodels. I will not deny, though, that there may be some instances where the ability to convert such information into a table would be greatly beneficial. The only difference between the two linear regression models built is that one accounts for the multiple predictors that have been inputted, rather than just one.</p>
+<p>The output of the models is ordinary in that they relay the same primary information of <em>summary(lm(…))</em> in table form. However, I was unpleasantly surprised by the lack of stars next to p-values. For this reason, I prefer the longer-winded <em>summary(lm(…))</em> to tidymodels. I will not deny, though, that there may be some instances where the ability to convert such information into a table would be greatly beneficial. The only difference between the two linear regression models built is that one accounts for the multiple predictors that have been inputted, rather than just one.</p>
 </section>
 </section>
 <section id="logistic-model" class="level1">
@@ -406,14 +416,14 @@ F-statistic: 6.796 on 7 and 722 DF,  p-value: 7.89e-08</code></pre>
 <section id="set-up-logistic-regression-engine" class="level2">
 <h2 class="anchored" data-anchor-id="set-up-logistic-regression-engine">Set Up Logistic Regression Engine</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>logistic_model <span class="ot">&lt;-</span> <span class="fu">logistic_reg</span>() <span class="sc">%&gt;%</span> <span class="fu">set_engine</span>(<span class="st">"glm"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>logistic_model <span class="ot">&lt;-</span> <span class="fu">logistic_reg</span>() <span class="sc">%&gt;%</span> <span class="fu">set_engine</span>(<span class="st">"glm"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="runny-nose-vs-nausea" class="level2">
 <h2 class="anchored" data-anchor-id="runny-nose-vs-nausea">Runny Nose vs Nausea</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tidymodels</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(logistic_model <span class="sc">%&gt;%</span> <span class="fu">fit</span>(Nausea <span class="sc">~</span> RunnyNose, <span class="at">data =</span> clean_data))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tidymodels</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(logistic_model <span class="sc">%&gt;%</span> <span class="fu">fit</span>(Nausea <span class="sc">~</span> RunnyNose, <span class="at">data =</span> clean_data))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 2 × 5
   term         estimate std.error statistic    p.value
@@ -421,21 +431,21 @@ F-statistic: 6.796 on 7 and 722 DF,  p-value: 7.89e-08</code></pre>
 1 (Intercept)   -0.658      0.145    -4.53  0.00000589
 2 RunnyNoseYes   0.0502     0.172     0.292 0.770     </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Base R</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">glm</span>(Nausea <span class="sc">~</span> RunnyNose, <span class="at">family =</span> binomial, <span class="at">data =</span> recoded_data))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Base R</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">glm</span>(Nausea <span class="sc">~</span> RunnyNose, <span class="at">family =</span> binomial, <span class="at">data =</span> clean_data))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
-glm(formula = Nausea ~ RunnyNose, family = binomial, data = recoded_data)
+glm(formula = Nausea ~ RunnyNose, family = binomial, data = clean_data)
 
 Deviance Residuals: 
     Min       1Q   Median       3Q      Max  
 -0.9325  -0.9325  -0.9137   1.4439   1.4664  
 
 Coefficients:
-            Estimate Std. Error z value Pr(&gt;|z|)    
-(Intercept) -0.65781    0.14520  -4.530 5.89e-06 ***
-RunnyNose    0.05018    0.17182   0.292     0.77    
+             Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)  -0.65781    0.14520  -4.530 5.89e-06 ***
+RunnyNoseYes  0.05018    0.17182   0.292     0.77    
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
@@ -452,44 +462,81 @@ Number of Fisher Scoring iterations: 4</code></pre>
 <section id="all-relevant-predictors-vs-nausea" class="level2">
 <h2 class="anchored" data-anchor-id="all-relevant-predictors-vs-nausea">All Relevant Predictors vs Nausea</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tidymodels</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>(<span class="fu">tidy</span>(logistic_model <span class="sc">%&gt;%</span> <span class="fu">fit</span>(Nausea <span class="sc">~</span> RunnyNose <span class="sc">+</span> Headache <span class="sc">+</span> EarPn <span class="sc">+</span> Vomit <span class="sc">+</span> BodyTemp, <span class="at">data =</span> clean_data)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tidymodels</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>(<span class="fu">tidy</span>(logistic_model <span class="sc">%&gt;%</span> <span class="fu">fit</span>(Nausea <span class="sc">~</span> SwollenLymphNodes <span class="sc">+</span> ChestCongestion <span class="sc">+</span> ChillsSweats <span class="sc">+</span> NasalCongestion <span class="sc">+</span> CoughYN <span class="sc">+</span> Sneeze <span class="sc">+</span> Fatigue <span class="sc">+</span> SubjectiveFever <span class="sc">+</span> Headache <span class="sc">+</span> Weakness <span class="sc">+</span> WeaknessYN <span class="sc">+</span> CoughIntensity <span class="sc">+</span> CoughYN2 <span class="sc">+</span> Myalgia <span class="sc">+</span> MyalgiaYN <span class="sc">+</span> RunnyNose <span class="sc">+</span> AbPain <span class="sc">+</span> ChestPain <span class="sc">+</span> Diarrhea <span class="sc">+</span> EyePn <span class="sc">+</span> Insomnia <span class="sc">+</span> ItchyEye <span class="sc">+</span> EarPn <span class="sc">+</span> Hearing <span class="sc">+</span> Pharyngitis <span class="sc">+</span> Breathless <span class="sc">+</span> ToothPn <span class="sc">+</span> Vision <span class="sc">+</span> Vomit <span class="sc">+</span> Wheeze <span class="sc">+</span> BodyTemp, <span class="at">data =</span> clean_data)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":["term"],"name":[1],"type":["chr"],"align":["left"]},{"label":["estimate"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["std.error"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["statistic"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["p.value"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"(Intercept)","2":"-2.52640359","3":"6.93740957","4":"-0.3641710","5":"7.157303e-01"},{"1":"RunnyNoseYes","2":"0.10757979","3":"0.18783543","4":"0.5727343","5":"5.668246e-01"},{"1":"HeadacheYes","2":"0.82431223","3":"0.26335928","4":"3.1299912","5":"1.748115e-03"},{"1":"EarPnYes","2":"0.19152072","3":"0.19826318","4":"0.9659923","5":"3.340480e-01"},{"1":"VomitYes","2":"2.48879841","3":"0.31557558","4":"7.8865367","5":"3.106881e-15"},{"1":"BodyTemp","2":"0.00815148","3":"0.06997937","4":"0.1164840","5":"9.072689e-01"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["term"],"name":[1],"type":["chr"],"align":["left"]},{"label":["estimate"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["std.error"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["statistic"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["p.value"],"name":[5],"type":["dbl"],"align":["right"]}],"data":[{"1":"(Intercept)","2":"0.222870461","3":"7.82740900","4":"0.02847308","5":"9.772848e-01"},{"1":"SwollenLymphNodesYes","2":"-0.251082552","3":"0.19602893","4":"-1.28084440","5":"2.002483e-01"},{"1":"ChestCongestionYes","2":"0.275553675","3":"0.21266164","4":"1.29573756","5":"1.950659e-01"},{"1":"ChillsSweatsYes","2":"0.274096650","3":"0.28782776","4":"0.95229401","5":"3.409479e-01"},{"1":"NasalCongestionYes","2":"0.425817357","3":"0.25456095","4":"1.67275208","5":"9.437611e-02"},{"1":"CoughYNYes","2":"-0.140423434","3":"0.51879849","4":"-0.27067047","5":"7.866445e-01"},{"1":"SneezeYes","2":"0.176723737","3":"0.21034933","4":"0.84014406","5":"4.008276e-01"},{"1":"FatigueYes","2":"0.229061781","3":"0.37188162","4":"0.61595348","5":"5.379252e-01"},{"1":"SubjectiveFeverYes","2":"0.277741143","3":"0.22536284","4":"1.23241765","5":"2.177931e-01"},{"1":"HeadacheYes","2":"0.331259159","3":"0.28489646","4":"1.16273526","5":"2.449369e-01"},{"1":"WeaknessMild","2":"-0.121605908","3":"0.44688639","4":"-0.27211817","5":"7.855312e-01"},{"1":"WeaknessModerate","2":"0.310848704","3":"0.45448257","4":"0.68396178","5":"4.939993e-01"},{"1":"WeaknessSevere","2":"0.823186934","3":"0.51042422","4":"1.61275053","5":"1.067987e-01"},{"1":"WeaknessYNYes","2":"NA","3":"NA","4":"NA","5":"NA"},{"1":"CoughIntensityMild","2":"-0.220793784","3":"0.58436728","4":"-0.37783392","5":"7.055540e-01"},{"1":"CoughIntensityModerate","2":"-0.362678351","3":"0.63137006","4":"-0.57443071","5":"5.656764e-01"},{"1":"CoughIntensitySevere","2":"-0.950544220","3":"0.65814232","4":"-1.44428369","5":"1.486592e-01"},{"1":"CoughYN2Yes","2":"NA","3":"NA","4":"NA","5":"NA"},{"1":"MyalgiaMild","2":"-0.004146204","3":"0.36809432","4":"-0.01126397","5":"9.910128e-01"},{"1":"MyalgiaModerate","2":"0.204742943","3":"0.37323050","4":"0.54856969","5":"5.833008e-01"},{"1":"MyalgiaSevere","2":"0.120758041","3":"0.44492654","4":"0.27141119","5":"7.860748e-01"},{"1":"MyalgiaYNYes","2":"NA","3":"NA","4":"NA","5":"NA"},{"1":"RunnyNoseYes","2":"0.045323566","3":"0.23264457","4":"0.19481893","5":"8.455347e-01"},{"1":"AbPainYes","2":"0.939303600","3":"0.28146320","4":"3.33721639","5":"8.462204e-04"},{"1":"ChestPainYes","2":"0.070777180","3":"0.22785833","4":"0.31061923","5":"7.560901e-01"},{"1":"DiarrheaYes","2":"1.063933753","3":"0.25870507","4":"4.11253544","5":"3.913374e-05"},{"1":"EyePnYes","2":"-0.341991033","3":"0.27771976","4":"-1.23142494","5":"2.181640e-01"},{"1":"InsomniaYes","2":"0.084175196","3":"0.19298507","4":"0.43617466","5":"6.627100e-01"},{"1":"ItchyEyeYes","2":"-0.063364460","3":"0.23250137","4":"-0.27253370","5":"7.852117e-01"},{"1":"EarPnYes","2":"-0.181718888","3":"0.23920743","4":"-0.75967074","5":"4.474514e-01"},{"1":"HearingYes","2":"0.323051692","3":"0.45240215","4":"0.71408080","5":"4.751772e-01"},{"1":"PharyngitisYes","2":"0.275364358","3":"0.26605880","4":"1.03497558","5":"3.006803e-01"},{"1":"BreathlessYes","2":"0.526801462","3":"0.20857922","4":"2.52566611","5":"1.154792e-02"},{"1":"ToothPnYes","2":"0.480648638","3":"0.22947394","4":"2.09456739","5":"3.620947e-02"},{"1":"VisionYes","2":"0.125497738","3":"0.54111406","4":"0.23192474","5":"8.165965e-01"},{"1":"VomitYes","2":"2.458465508","3":"0.34860770","4":"7.05224108","5":"1.760588e-12"},{"1":"WheezeYes","2":"-0.304434833","3":"0.23408383","4":"-1.30053762","5":"1.934168e-01"},{"1":"BodyTemp","2":"-0.031246003","3":"0.07983814","4":"-0.39136685","5":"6.955261e-01"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Base R</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">glm</span>(Nausea <span class="sc">~</span> RunnyNose <span class="sc">+</span> Headache <span class="sc">+</span> EarPn <span class="sc">+</span> Vomit <span class="sc">+</span> BodyTemp, <span class="at">family =</span> binomial, <span class="at">data =</span> recoded_data))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Base R</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">glm</span>(Nausea <span class="sc">~</span> SwollenLymphNodes <span class="sc">+</span> ChestCongestion <span class="sc">+</span> ChillsSweats <span class="sc">+</span> NasalCongestion <span class="sc">+</span> CoughYN <span class="sc">+</span> Sneeze <span class="sc">+</span> Fatigue <span class="sc">+</span> SubjectiveFever <span class="sc">+</span> Headache <span class="sc">+</span> Weakness <span class="sc">+</span> WeaknessYN <span class="sc">+</span> CoughIntensity <span class="sc">+</span> CoughYN2 <span class="sc">+</span> Myalgia <span class="sc">+</span> MyalgiaYN <span class="sc">+</span> RunnyNose <span class="sc">+</span> AbPain <span class="sc">+</span> ChestPain <span class="sc">+</span> Diarrhea <span class="sc">+</span> EyePn <span class="sc">+</span> Insomnia <span class="sc">+</span> ItchyEye <span class="sc">+</span> EarPn <span class="sc">+</span> Hearing <span class="sc">+</span> Pharyngitis <span class="sc">+</span> Breathless <span class="sc">+</span> ToothPn <span class="sc">+</span> Vision <span class="sc">+</span> Vomit <span class="sc">+</span> Wheeze <span class="sc">+</span> BodyTemp, <span class="at">family =</span> binomial, <span class="at">data =</span> clean_data))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
-glm(formula = Nausea ~ RunnyNose + Headache + EarPn + Vomit + 
-    BodyTemp, family = binomial, data = recoded_data)
+glm(formula = Nausea ~ SwollenLymphNodes + ChestCongestion + 
+    ChillsSweats + NasalCongestion + CoughYN + Sneeze + Fatigue + 
+    SubjectiveFever + Headache + Weakness + WeaknessYN + CoughIntensity + 
+    CoughYN2 + Myalgia + MyalgiaYN + RunnyNose + AbPain + ChestPain + 
+    Diarrhea + EyePn + Insomnia + ItchyEye + EarPn + Hearing + 
+    Pharyngitis + Breathless + ToothPn + Vision + Vomit + Wheeze + 
+    BodyTemp, family = binomial, data = clean_data)
 
 Deviance Residuals: 
     Min       1Q   Median       3Q      Max  
--2.0140  -0.8651  -0.8260   1.4347   1.9423  
+-1.9065  -0.8138  -0.5301   0.8581   2.4268  
 
-Coefficients:
-             Estimate Std. Error z value Pr(&gt;|z|)    
-(Intercept) -2.526404   6.937410  -0.364  0.71573    
-RunnyNose    0.107580   0.187835   0.573  0.56682    
-Headache     0.824312   0.263359   3.130  0.00175 ** 
-EarPn        0.191521   0.198263   0.966  0.33405    
-Vomit        2.488798   0.315576   7.887 3.11e-15 ***
-BodyTemp     0.008151   0.069979   0.116  0.90727    
+Coefficients: (3 not defined because of singularities)
+                        Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)             0.222870   7.827409   0.028 0.977285    
+SwollenLymphNodesYes   -0.251083   0.196029  -1.281 0.200248    
+ChestCongestionYes      0.275554   0.212662   1.296 0.195066    
+ChillsSweatsYes         0.274097   0.287828   0.952 0.340948    
+NasalCongestionYes      0.425817   0.254561   1.673 0.094376 .  
+CoughYNYes             -0.140423   0.518798  -0.271 0.786644    
+SneezeYes               0.176724   0.210349   0.840 0.400828    
+FatigueYes              0.229062   0.371882   0.616 0.537925    
+SubjectiveFeverYes      0.277741   0.225363   1.232 0.217793    
+HeadacheYes             0.331259   0.284896   1.163 0.244937    
+WeaknessMild           -0.121606   0.446886  -0.272 0.785531    
+WeaknessModerate        0.310849   0.454483   0.684 0.493999    
+WeaknessSevere          0.823187   0.510424   1.613 0.106799    
+WeaknessYNYes                 NA         NA      NA       NA    
+CoughIntensityMild     -0.220794   0.584367  -0.378 0.705554    
+CoughIntensityModerate -0.362678   0.631370  -0.574 0.565676    
+CoughIntensitySevere   -0.950544   0.658142  -1.444 0.148659    
+CoughYN2Yes                   NA         NA      NA       NA    
+MyalgiaMild            -0.004146   0.368094  -0.011 0.991013    
+MyalgiaModerate         0.204743   0.373231   0.549 0.583301    
+MyalgiaSevere           0.120758   0.444927   0.271 0.786075    
+MyalgiaYNYes                  NA         NA      NA       NA    
+RunnyNoseYes            0.045324   0.232645   0.195 0.845535    
+AbPainYes               0.939304   0.281463   3.337 0.000846 ***
+ChestPainYes            0.070777   0.227858   0.311 0.756090    
+DiarrheaYes             1.063934   0.258705   4.113 3.91e-05 ***
+EyePnYes               -0.341991   0.277720  -1.231 0.218164    
+InsomniaYes             0.084175   0.192985   0.436 0.662710    
+ItchyEyeYes            -0.063364   0.232501  -0.273 0.785212    
+EarPnYes               -0.181719   0.239207  -0.760 0.447451    
+HearingYes              0.323052   0.452402   0.714 0.475177    
+PharyngitisYes          0.275364   0.266059   1.035 0.300680    
+BreathlessYes           0.526801   0.208579   2.526 0.011548 *  
+ToothPnYes              0.480649   0.229474   2.095 0.036209 *  
+VisionYes               0.125498   0.541114   0.232 0.816596    
+VomitYes                2.458466   0.348608   7.052 1.76e-12 ***
+WheezeYes              -0.304435   0.234084  -1.301 0.193417    
+BodyTemp               -0.031246   0.079838  -0.391 0.695526    
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
 (Dispersion parameter for binomial family taken to be 1)
 
     Null deviance: 944.65  on 729  degrees of freedom
-Residual deviance: 848.80  on 724  degrees of freedom
-AIC: 860.8
+Residual deviance: 751.47  on 695  degrees of freedom
+AIC: 821.47
 
 Number of Fisher Scoring iterations: 4</code></pre>
 </div>
