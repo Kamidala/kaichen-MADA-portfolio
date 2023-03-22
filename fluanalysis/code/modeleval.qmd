@@ -128,3 +128,145 @@ new_test_augment %>%
 ```
 
 The alternative model that uses just one predictor appears to be much worse (Training ROC-AUC: 0.515, Test ROC-AUC: 0.476) than the model that uses all predictors (Training ROC-AUC: 0.796, Test ROC-AUC: 0.672).
+
+
+
+
+
+
+# This section added by CONNOR H ROSS (below)
+
+## Part II: Continous Outcome
+```{r}
+# Part II: Continous Outcome
+## Libraries already loaded above (Thanks Kailin :))
+
+## Set seed for reproducibility
+set.seed(2)
+
+
+
+## Split 3/4 of the data into the training set
+flu_splitc1 <- initial_split(clean_data, prop = 3/4)
+
+
+
+## Create data frame for the two sets:
+train_datac1 <- training(flu_splitc1)
+test_datac1 <- testing(flu_splitc1)
+
+
+## Full model
+
+### Creating my recipe
+flu_recipec1 <- recipe(BodyTemp ~ ., data = clean_data)
+
+
+
+### Prepare model
+lin_modc1 <- linear_reg() %>%
+  set_engine("lm")
+
+
+
+### Create workflow
+flu_wflowc1 <- workflow() %>%
+  add_model(lin_modc1) %>%
+  add_recipe(flu_recipec1)
+
+
+
+### Prepare the recipe and train the model
+flu_fitc1 <- flu_wflowc1 %>%
+  fit(data = train_datac1)
+
+
+
+### Tidy output
+flu_fitc1 %>%
+  extract_fit_parsnip() %>%
+  tidy()
+
+
+
+### Prediction
+predict(flu_fitc1, test_datac1)
+
+
+
+### Augment
+flu_augc1 <- augment(flu_fitc1, test_datac1)
+
+
+
+### Looks like
+flu_augc1 %>%
+  select(BodyTemp, .pred)
+
+
+
+### flu_aug
+flu_augc1 %>%
+  rmse(BodyTemp , .pred)
+
+
+
+
+
+
+### One Predictor
+## Creating my recipe2
+flu_recipec2 <- recipe(BodyTemp ~ RunnyNose, data = clean_data)
+
+
+
+#### Previous model will work
+
+
+
+### Create workflow2
+flu_wflowc2 <- workflow() %>%
+  add_model(lin_modc1) %>%
+  add_recipe(flu_recipec2)
+
+
+
+### Prepare the recipe and train the model2
+flu_fitc2 <- flu_wflowc2 %>%
+  fit(data = train_datac1)
+
+
+
+### Tidy output2
+flu_fitc2 %>%
+  extract_fit_parsnip() %>%
+  tidy()
+
+
+
+### Prediction2
+predict(flu_fitc2, test_datac1)
+
+
+
+### Augment2
+flu_augc2 <- augment(flu_fitc2, test_datac1)
+
+
+
+### Looks like2
+flu_augc2 %>%
+  select(BodyTemp, .pred)
+
+
+
+### flu_aug2
+flu_augc2 %>%
+  rmse(BodyTemp , .pred)
+
+```
+
+# ^^ This section added by CONNOR H ROSS ^^
+
+
+
