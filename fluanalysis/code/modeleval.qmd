@@ -1,0 +1,130 @@
+# Flu Analysis (Logistic Regression) Model Evaluation, Performed by Kai Chen
+## Load Libraries
+```{r}
+# Pathing
+library(here)
+
+# Data Handling
+library(tidyverse)
+
+# Model Handling and Evaluation
+library(tidymodels)
+```
+
+## Load Data
+```{r}
+# Set Variable for Where Original Data is Located
+data_location <- here("fluanalysis", "data", "cleaned_data.rds")
+
+# Read in Original Data
+original_data <- readRDS(data_location)
+```
+
+## Data Splitting
+```{r}
+# Set Seed for Reproducible Analysis
+set.seed(2023)
+
+# Split Original Data into Training and Testing Data
+data_split <- initial_split(original_data, prop = 3/4)
+
+# Create Data Frames from Split Data
+train_data <- training(data_split)
+test_data <- testing(data_split)
+```
+
+## Workflow Creation and Model Fitting
+### Create Recipe for Fitting Logistic Model (Categorical Outcome)
+```{r}
+flu_recipe <- recipe(Nausea ~ ., data = train_data)
+```
+
+### Workflow to Create Logistic Model
+```{r}
+# Set Model to Logistic Regression
+logistic_regression_model <- logistic_reg() %>% set_engine("glm")
+
+# Specifying Workflow
+logistic_workflow <- workflow() %>% 
+  add_model(logistic_regression_model) %>%
+  add_recipe(flu_recipe)
+
+# Fitting/Training
+logistic_fit <- logistic_workflow %>%
+  fit(data = train_data)
+```
+
+## Model 1 Evaluation
+### Prediction + ROC Curve
+```{r}
+# Training Data
+predict(logistic_fit, train_data)
+train_augment <- augment(logistic_fit, train_data)
+## Generate ROC Curve
+train_augment %>% 
+  roc_curve(truth = Nausea, .pred_No) %>%
+  autoplot()
+## Calculate ROC-AUC
+train_augment %>%
+  roc_auc(truth = Nausea, .pred_No)
+
+
+# Test Data
+predict(logistic_fit, test_data)
+test_augment <- augment(logistic_fit, test_data)
+## Generate ROC Curve
+test_augment %>%
+  roc_curve(truth = Nausea, .pred_No) %>%
+  autoplot()
+## Calculate ROC-AUC
+test_augment %>%
+  roc_auc(truth = Nausea, .pred_No)
+```
+
+The fitted model appears to perform worse on the test data (ROC-AUC = 0.672) than on the training data (ROC-AUC = 0.796).
+
+## Alternative Model (Single Predictor: RunnyNose)
+### Modified Flu Recipe
+```{r}
+new_flu_recipe <- recipe(Nausea ~ RunnyNose, data = train_data)
+```
+
+### New Workflow
+```{r}
+# Specifying Workflow
+new_logistic_workflow <- workflow() %>% 
+  add_model(logistic_regression_model) %>%
+  add_recipe(new_flu_recipe)
+
+# Fitting/Training
+new_logistic_fit <- new_logistic_workflow %>%
+  fit(data = train_data)
+```
+
+### Alternative Model Evaluation
+```{r}
+# Training Data
+predict(new_logistic_fit, train_data)
+new_train_augment <- augment(new_logistic_fit, train_data)
+## Generate ROC Curve
+new_train_augment %>% 
+  roc_curve(truth = Nausea, .pred_No) %>%
+  autoplot()
+## Calculate ROC-AUC
+new_train_augment %>%
+  roc_auc(truth = Nausea, .pred_No)
+
+
+# Test Data
+predict(new_logistic_fit, test_data)
+new_test_augment <- augment(new_logistic_fit, test_data)
+## Generate ROC Curve
+new_test_augment %>%
+  roc_curve(truth = Nausea, .pred_No) %>%
+  autoplot()
+## Calculate ROC-AUC
+new_test_augment %>%
+  roc_auc(truth = Nausea, .pred_No)
+```
+
+The alternative model that uses just one predictor appears to be much worse (Training ROC-AUC: 0.515, Test ROC-AUC: 0.476) than the model that uses all predictors (Training ROC-AUC: 0.796, Test ROC-AUC: 0.672).
