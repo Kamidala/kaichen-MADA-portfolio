@@ -1,3 +1,9 @@
+---
+title: "Module 10 Exercise: Flu Analysis Modeling Workflow"
+output: 
+  html_document:
+      toc: FALSE
+---
 # Flu Analysis (Logistic Regression) Model Evaluation, Performed by Kai Chen
 ## Load Libraries
 ```{r}
@@ -147,7 +153,7 @@ set.seed(2)
 
 
 ## Split 3/4 of the data into the training set
-flu_splitc1 <- initial_split(clean_data, prop = 3/4)
+flu_splitc1 <- initial_split(original_data, prop = 3/4)
 
 
 
@@ -159,7 +165,7 @@ test_datac1 <- testing(flu_splitc1)
 ## Full model
 
 ### Creating my recipe
-flu_recipec1 <- recipe(BodyTemp ~ ., data = clean_data)
+flu_recipec1 <- recipe(BodyTemp ~ ., data = original_data)
 
 
 
@@ -216,7 +222,7 @@ flu_augc1 %>%
 
 ### One Predictor
 ## Creating my recipe2
-flu_recipec2 <- recipe(BodyTemp ~ RunnyNose, data = clean_data)
+flu_recipec2 <- recipe(BodyTemp ~ RunnyNose, data = original_data)
 
 
 
