@@ -1,0 +1,354 @@
+---
+title: "Module 11 Exercise - Machine Learning"
+output: 
+  html_document:
+      toc: FALSE
+---
+# Load Libraries
+```{r}
+# Data Handling
+library(tidyverse)
+
+# Pathing
+library(here)
+
+# Model Handling
+library(tidymodels)
+library(rpart)
+library(vip)
+
+# Visualizations
+library(ggplot2)
+
+```
+
+# Load Data
+```{r}
+# Path to Cleaned Data
+cleaned_data_path <- here("fluanalysis", "data", "cleaned_data_March.rds")
+
+# Reading in Cleaned Data from March (Categorical Variables Have Already Been Modified)
+clean_data_March <- readRDS(cleaned_data_path)
+```
+
+# Data Setup
+
+## Set Seed for Reproducibility
+```{r}
+set.seed(123)
+```
+
+## Split Data
+```{r}
+# Split Data
+data_division <- initial_split(clean_data_March, prop = 70/100, strata = BodyTemp)
+
+# Create Data Frames from Split Data
+training_data <- training(data_division)
+testing_data <- testing(data_division)
+```
+
+## Cross-Validation
+```{r}
+post_cv <- vfold_cv(training_data, v = 5, repeats = 5, strata = BodyTemp)
+```
+
+## Recipe for Data and Fitting
+
+### Set Model to Linear Regression
+```{r}
+linear_model <- linear_reg() %>% set_engine("lm")
+```
+
+### Workflow
+```{r}
+# Recipe
+linear_recipe <- recipe(BodyTemp ~ ., data = training_data)
+
+# Make Workflow
+linear_workflow <- workflow() %>%
+  add_model(linear_model) %>%
+  add_recipe(linear_recipe)
+```
+
+# Null Model Setup
+```{r}
+# Current Null Model
+current_null_model <- null_model() %>% 
+  set_engine("parsnip") %>% 
+  set_mode("regression")
+
+# Null Model Recipe & Workflow
+null_recipe <- recipe(BodyTemp ~., data = training_data) %>%
+  step_zv(all_predictors())
+null_workflow <- workflow() %>%
+  add_model(current_null_model) %>%
+  add_recipe(null_recipe)
+
+extract_parameter_set_dials(null_workflow)
+
+# Training Data: RMSE
+fitted_null <- null_workflow %>%
+  fit(data = training_data)
+## Check Fit
+fitted_null %>%
+  extract_fit_parsnip() %>%
+  tidy()
+## Augmentation
+augmented_null <- augment(fitted_null, training_data)
+augmented_null %>%
+  select(BodyTemp, .pred) %>%
+  rmse(BodyTemp, .pred)
+
+# Test Data: RMSE
+## Augmentation
+augmented_null_test <- augment(fitted_null, testing_data)
+augmented_null_test %>%
+  select(BodyTemp, .pred) %>%
+  rmse(BodyTemp, .pred)
+
+```
+
+# Model Tuning and Fitting
+
+### Tree
+```{r}
+# Model Specification
+tune_spec <- 
+  decision_tree(
+    cost_complexity = tune(),
+    tree_depth = tune()
+  ) %>%
+  set_engine("rpart") %>%
+  set_mode("regression")
+
+# Grid Creation
+tree_grid <- grid_regular(
+  cost_complexity(),
+  tree_depth(),
+  levels = 5
+)
+
+# Tree Workflow
+tree_workflow <- workflow() %>%
+  add_model(tune_spec) %>%
+  add_formula(BodyTemp ~.)
+
+tree_res <- tree_workflow %>%
+  tune_grid(resamples = post_cv, grid = tree_grid)
+
+# Collect Metrics
+tree_res %>% collect_metrics() %>%
+  mutate(tree_depth = factor(tree_depth)) %>%
+  ggplot(aes(cost_complexity, mean, color = tree_depth)) + 
+  geom_line(linewidth = 1.5, alpha = 0.6) +
+  geom_point(size = 2) + 
+  facet_wrap(~ .metric, scales = "free", nrow = 2) +
+  scale_color_viridis_d(option = "plasma", begin = .9, end = 0)
+
+# Show and Select From the Best
+tree_res %>% show_best("rmse")
+
+best_tree <- tree_res %>% select_best("rmse")
+
+final_workflow <- tree_workflow %>% finalize_workflow(best_tree)
+
+final_fit <- final_workflow %>% fit(training_data)
+
+# To Be Removed:
+# final_fit <- final_workflow %>% last_fit(data_division)
+
+```
+The best tree model, as determined in R, has an RMSE of 1.189. The null model has an RMSE of 1.209. 
+
+### Tree Model Evaluation
+```{r}
+# Model Predictions from Tuned Model vs Actual Outcomes
+tree_predictions <- predict(final_fit, training_data)
+dummy_column <- c(1:nrow(tree_predictions))
+tree_predictions <- cbind(training_data, tree_predictions) %>% 
+  select(BodyTemp, .pred) %>% 
+  cbind(dummy_column)
+tree_predictions <- tree_predictions %>% pivot_longer(BodyTemp:.pred, names_to = "Group", values_to = "Temperature")
+## Graph
+ggplot(tree_predictions, aes(x = dummy_column, y = Temperature, group = Group, color = Group)) + geom_point() + geom_jitter() + theme(
+  axis.title.x = element_blank(), 
+  axis.text.x = element_blank(), 
+  axis.ticks.x = element_blank())
+
+# Plot Residuals
+tree_residuals <- final_fit %>%
+  augment(training_data) %>%
+  select(.pred, BodyTemp) %>%
+  mutate(.resid = BodyTemp - .pred)
+## Graph
+ggplot(tree_residuals, aes(x = BodyTemp, y = .resid)) + geom_point() + geom_hline(yintercept = 0, color = "black", linewidth = 1)
+
+```
+
+
+### Lasso Model
+```{r}
+# Set Aside Data for Validation
+val_set <- validation_split(training_data, strata = BodyTemp, prop = 0.80)
+
+# Build Model for Penalized Linear Regression
+lr_mod <- linear_reg(penalty = tune(), mixture = 1) %>%
+  set_engine("glmnet")
+## Recipe
+lr_workflow <- workflow() %>% add_model(lr_mod) %>% add_recipe(linear_recipe)
+
+# Tuning Grid
+lr_reg_grid <- tibble(penalty = 10^seq(-4, -1, length.out = 30))
+lr_reg_grid %>% top_n(-5)
+lr_reg_grid %>% top_n(5)
+
+lr_res <- lr_workflow %>%
+  tune_grid(val_set, grid = lr_reg_grid, 
+            control = control_grid(save_pred = TRUE), 
+            metrics = metric_set(rmse))
+
+lr_res %>% collect_metrics() %>% 
+  ggplot(aes(penalty, mean)) + geom_point() +
+  geom_line()
+
+# Check Performance
+top_models <- lr_res %>% show_best("rmse", n = 15) %>%
+  arrange(penalty)
+top_models %>% arrange(mean)
+
+# Select Best Model (Following Example in Tutorial)
+lr_best <- lr_res %>% collect_metrics() %>% arrange(penalty) %>% slice(12)
+lr_best
+
+```
+
+The best LASSO model, as determined by R, has RMSE = 1.226. Again, the null model has RMSE = 1.209.
+
+### LASSO Model Evaluation
+```{r}
+# Setup of New Dataframe for Model Evaluation
+lr_res %>% select_best("rmse")
+LASSO_Predictions <- lr_res$.predictions[[1]] %>% filter(.config == "Preprocessor1_Model30") %>% relocate(.pred, .after = BodyTemp)
+dummy_column <- c(1:nrow(LASSO_Predictions))
+LASSO_Predictions <- cbind(LASSO_Predictions, dummy_column) %>%
+  mutate(.resid = BodyTemp - .pred)
+
+
+# Plot Residuals
+ggplot(LASSO_Predictions, aes(x = BodyTemp, y = .resid)) + geom_point() + geom_jitter() + geom_hline(yintercept = 0, color = "black", linewidth = 1)
+
+
+# Dataframe Modification for Predicted vs Original Values
+LASSO_Predictions <- LASSO_Predictions %>% pivot_longer(BodyTemp:.pred, names_to = "Group", values_to = "Temperature")
+## Graph
+ggplot(LASSO_Predictions, aes(x = dummy_column, y = Temperature, group = Group, color = Group)) + geom_point() + geom_jitter() + theme(
+  axis.title.x = element_blank(), 
+  axis.text.x = element_blank(), 
+  axis.ticks.x = element_blank())
+
+```
+
+### Random Forest
+```{r}
+# How Many Cores?
+cores <- parallel::detectCores()
+
+# Enable Parallel Processing
+rf_mod <- rand_forest(mtry = tune(), min_n = tune(), trees = 1000) %>%
+  set_engine("ranger", num.threads = cores) %>%
+  set_mode("regression")
+
+# Establish Workflow
+rf_workflow <- workflow() %>% add_model(rf_mod) %>% add_recipe(linear_recipe)
+
+extract_parameter_set_dials(rf_mod)
+
+# Generate 25 Candidate Models
+rf_res <- rf_workflow %>% tune_grid(val_set, grid = 25, 
+                                    control = control_grid(save_pred =  TRUE),
+                                    metrics = metric_set(rmse))
+rf_res %>% show_best(metric = "rmse")
+autoplot(rf_res)
+
+# Select Best Model
+rf_best <- rf_res %>% select_best(metric = "rmse")
+
+rf_rmse <- rf_res %>% 
+  collect_predictions() %>% 
+  rmse(BodyTemp, .pred) %>% 
+  mutate(model = "Random Forest")
+
+# Final Model
+last_rf_mod <- rand_forest(mtry = 8, min_n = 7, trees = 1000) %>%
+  set_engine("ranger", num.cores = cores, importance = "impurity") %>%
+  set_mode("regression")
+
+last_rf_workflow <- rf_workflow %>% update_model(last_rf_mod)
+
+last_rf_fit <- last_rf_workflow %>% last_fit(data_division)
+last_rf_fit %>% collect_metrics()
+last_rf_fit %>% extract_fit_parsnip() %>% vip(num_features = 20)
+
+```
+The random forest model, according to R, has RMSE = 1.226. The null model has RMSE = 1.209.
+
+### Model Evaluation for Random Forest
+```{r}
+# Model Evaluation Dataframe Setup
+last_rf_fit %>% select_best("rmse")
+random_forest_eval <- last_rf_fit$.predictions[[1]] %>% 
+  filter(.config == "Preprocessor1_Model1") %>% 
+  relocate(.pred, .after = BodyTemp)
+dummy_column <- c(1:nrow(random_forest_eval))
+random_forest_eval <- cbind(random_forest_eval, dummy_column) %>% 
+  mutate(.resid = BodyTemp - .pred)
+
+# Plot Residuals
+ggplot(random_forest_eval, aes(x = BodyTemp, y = .resid)) + 
+  geom_point() + geom_hline(yintercept = 0, color = "black", linewidth = 1)
+
+# Model Predictions from Tuned Model vs Actual Outcomes
+random_forest_eval <- random_forest_eval %>% 
+  pivot_longer(BodyTemp:.pred, names_to = "Group", values_to = "Temperature")
+## Graph
+ggplot(random_forest_eval, aes(x = dummy_column, y = Temperature, group = Group, color = Group)) + geom_point() + geom_jitter() + theme(
+  axis.title.x = element_blank(), 
+  axis.text.x = element_blank(), 
+  axis.ticks.x = element_blank())
+
+```
+
+# Model Selection & Final Evaluation
+
+Based on the results, I have chosen the tree model as the best model of the 3 since it is the only one that has a lower RMSE than the null model (meaning that it outperforms the null). The LASSO and random forest models, in contrast, have higher RMSEs than the null (and underperform). However, it is noteworthy that 
+
+```{r}
+# Check Performance on Test Data
+selected_model <- final_workflow %>% fit(testing_data)
+selected_model %>% extract_fit_parsnip()
+## RMSE
+selected_augment <- augment(selected_model, testing_data) %>% 
+  select(BodyTemp, .pred)
+selected_augment %>% rmse(BodyTemp, .pred)
+
+# Set Up Final Model Dataframe for Evaluation
+dummy_column <- c(1:nrow(selected_augment))
+selected_augment <- selected_augment %>% 
+  cbind(dummy_column) %>% 
+  mutate(.resid = BodyTemp - .pred)
+
+# Plot Residuals
+ggplot(selected_augment, aes(x = BodyTemp, y = .resid)) + geom_point() + geom_hline(yintercept = 0, color = "black", linewidth = 1)
+
+# Model Predictions from Tuned Model vs Actual Outcomes
+selected_augment <- selected_augment %>% pivot_longer(BodyTemp:.pred, names_to = "Group", values_to = "Temperature")
+## Graph
+ggplot(selected_augment, aes(x = dummy_column, y = Temperature, group = Group, color = Group)) + geom_point() + geom_jitter() + theme(
+  axis.title.x = element_blank(), 
+  axis.text.x = element_blank(), 
+  axis.ticks.x = element_blank())
+
+```
+
+As the RMSE from the model is 1.143, it performed better than the null model, but only just (RMSE = 1.163).

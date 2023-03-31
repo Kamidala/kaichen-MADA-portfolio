@@ -9,10 +9,11 @@ output:
 
 ## Load Required R Packages
 
-Tidyverse will be used for handling data processing/manipulation, and the here() package assists in pathing.
+Tidyverse will be used for handling data processing/manipulation, and the here() package assists in pathing. Tidymodels is used for model handling.
 
 ```{r include=FALSE}
 library(tidyverse)
+library(tidymodels)
 library(here)
 ```
 
@@ -28,7 +29,7 @@ raw_data <- readRDS(data_path)
 
 # Data Manipulation
 
-During this stage, unnecessary columns and any NA values will be removed according to the assignment instructions. Column removal will be accomplished through the syntax `select(!contains())`, for this method includes all columns that are not the ones specified in the command. Tidyverse has the command `drop_na()`, permitting the removal of all observations containing any NA values across the dataset.
+During this initial stage, unnecessary columns and any NA values will be removed according to the assignment instructions. Column removal will be accomplished through the syntax `select(!contains())`, for this method includes all columns that are not the ones specified in the command. Tidyverse has the command `drop_na()`, permitting the removal of all observations containing any NA values across the dataset.
 
 ```{r}
 # Removal of Unnecessary Columns
@@ -58,3 +59,104 @@ data_path <- here("fluanalysis", "data", "cleaned_data.rds")
 # Saving Dataset as RDS
 saveRDS(clean_data, file = data_path)
 ```
+
+# Addendum: Exercise for Week of 3/27/2023
+
+## Feature Removal
+
+`Weakness`, `Cough`, and `Myalgia` exist on both a severity score and as Yes/No. They may confuse the model, so all Yes/No versions will be removed.
+
+```{r}
+clean_data_March <- clean_data %>%
+  select(!CoughYN) %>%
+  select(!CoughYN2) %>%
+  select(!WeaknessYN) %>%
+  select(!MyalgiaYN)
+```
+
+## Categorical/Ordinal Predictors
+
+For an easier time building and handling the model, categorical variables will be coded as unordered factors and others as ordered factors.
+
+### Categorical Variables
+
+```{r}
+# Recipe Creation
+categorical_recipe <- recipe(~ SwollenLymphNodes + ChestCongestion + ChillsSweats + NasalCongestion + Sneeze + Fatigue + SubjectiveFever + Headache + RunnyNose + AbPain + ChestPain + Diarrhea + EyePn + Insomnia + ItchyEye + Nausea + EarPn + Hearing + Pharyngitis + Breathless + ToothPn + Vision + Vomit + Wheeze + Weakness + CoughIntensity + Myalgia + BodyTemp, data = clean_data)
+
+# Categorical Variables
+categorical_dummies <- categorical_recipe %>% 
+  step_dummy(SwollenLymphNodes) %>% 
+  step_dummy(ChestCongestion) %>%
+  step_dummy(ChillsSweats) %>%
+  step_dummy(NasalCongestion) %>%
+  step_dummy(Sneeze) %>%
+  step_dummy(Fatigue) %>%
+  step_dummy(SubjectiveFever) %>%
+  step_dummy(Headache) %>%
+  step_dummy(RunnyNose) %>%
+  step_dummy(AbPain) %>%
+  step_dummy(ChestPain) %>%
+  step_dummy(Diarrhea) %>%
+  step_dummy(EyePn) %>%
+  step_dummy(Insomnia) %>%
+  step_dummy(ItchyEye) %>%
+  step_dummy(Nausea) %>%
+  step_dummy(EarPn) %>%
+  step_dummy(Hearing) %>%
+  step_dummy(Pharyngitis) %>%
+  step_dummy(Breathless) %>%
+  step_dummy(ToothPn) %>%
+  step_dummy(Vision) %>%
+  step_dummy(Vomit) %>%
+  step_dummy(Wheeze) %>%
+  prep(training = clean_data)
+
+# New Dataset Generated
+categorical_dummies <- bake(categorical_dummies, new_data = NULL)
+```
+
+### Ordered Factors
+```{r}
+# Ordered Factors Using Previous Objects Generated
+ord_recipe <- recipe(~ SwollenLymphNodes_Yes + ChestCongestion_Yes + ChillsSweats_Yes + NasalCongestion_Yes + Sneeze_Yes + Fatigue_Yes + SubjectiveFever_Yes + Headache_Yes + RunnyNose_Yes + AbPain_Yes + ChestPain_Yes + Diarrhea_Yes + EyePn_Yes + Insomnia_Yes + ItchyEye_Yes + Nausea_Yes + EarPn_Yes + Hearing_Yes + Pharyngitis_Yes + Breathless_Yes + ToothPn_Yes + Vision_Yes + Vomit_Yes + Wheeze_Yes + Weakness + CoughIntensity + Myalgia + BodyTemp, data = categorical_dummies)
+
+# Change Expected Ordinal Variables to Ordered Factors
+categorical_dummies$Weakness <- as.ordered(categorical_dummies$Weakness)
+categorical_dummies$Myalgia <- as.ordered(categorical_dummies$Myalgia)
+categorical_dummies$CoughIntensity <- as.ordered(categorical_dummies$CoughIntensity)
+
+# Ordinal Variables
+ord_dummies <- ord_recipe %>%
+  step_ordinalscore(CoughIntensity) %>%
+  step_ordinalscore(Myalgia) %>%
+  step_ordinalscore(Weakness) %>%
+  prep(training = categorical_dummies)
+
+# Generate New Dataset
+ord_dummies <- bake(ord_dummies, new_data = NULL)
+
+```
+
+### Removal of Near-Zero Variance Predictors
+```{r}
+filtered_process <- ord_recipe %>%
+  step_nzv(all_predictors()) %>%
+  prep(training = ord_dummies)
+
+# Final Cleaned Dataset
+clean_data_March <- bake(filtered_process, new_data = NULL)
+```
+
+# Saving Copy of New Data
+
+This newer cleaned dataset shall be saved as well to be used in the "machinelearning.qmd" document.
+
+```{r}
+# Pathing
+data_path <- here("fluanalysis", "data", "cleaned_data_March.rds")
+
+# Saving Dataset as RDS
+saveRDS(clean_data_March, file = data_path)
+```
+

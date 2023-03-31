@@ -193,6 +193,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <a class="dropdown-item" href="../.././fluanalysis/code/modeleval.html">
  <span class="dropdown-text">Model Evaluation</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="../.././fluanalysis/code/machinelearning.html">
+ <span class="dropdown-text">Machine Learning</span></a>
+  </li>  
     </ul>
   </li>
 </ul>
@@ -237,7 +241,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h1>Setup</h1>
 <section id="load-required-r-packages" class="level2">
 <h2 class="anchored" data-anchor-id="load-required-r-packages">Load Required R Packages</h2>
-<p>Tidyverse will be used for handling data processing/manipulation, and the here() package assists in pathing.</p>
+<p>Tidyverse will be used for handling data processing/manipulation, and the here() package assists in pathing. Tidymodels is used for model handling.</p>
 </section>
 <section id="load-data" class="level2">
 <h2 class="anchored" data-anchor-id="load-data">Load Data</h2>
@@ -252,7 +256,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </section>
 <section id="data-manipulation" class="level1">
 <h1>Data Manipulation</h1>
-<p>During this stage, unnecessary columns and any NA values will be removed according to the assignment instructions. Column removal will be accomplished through the syntax <code>select(!contains())</code>, for this method includes all columns that are not the ones specified in the command. Tidyverse has the command <code>drop_na()</code>, permitting the removal of all observations containing any NA values across the dataset.</p>
+<p>During this initial stage, unnecessary columns and any NA values will be removed according to the assignment instructions. Column removal will be accomplished through the syntax <code>select(!contains())</code>, for this method includes all columns that are not the ones specified in the command. Tidyverse has the command <code>drop_na()</code>, permitting the removal of all observations containing any NA values across the dataset.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Removal of Unnecessary Columns</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>clean_data <span class="ot">&lt;-</span> raw_data <span class="sc">%&gt;%</span></span>
@@ -293,6 +297,106 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Saving Dataset as RDS</span></span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(clean_data, <span class="at">file =</span> data_path)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="addendum-exercise-for-week-of-3272023" class="level1">
+<h1>Addendum: Exercise for Week of 3/27/2023</h1>
+<section id="feature-removal" class="level2">
+<h2 class="anchored" data-anchor-id="feature-removal">Feature Removal</h2>
+<p><code>Weakness</code>, <code>Cough</code>, and <code>Myalgia</code> exist on both a severity score and as Yes/No.&nbsp;They may confuse the model, so all Yes/No versions will be removed.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>clean_data_March <span class="ot">&lt;-</span> clean_data <span class="sc">%&gt;%</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">!</span>CoughYN) <span class="sc">%&gt;%</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">!</span>CoughYN2) <span class="sc">%&gt;%</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">!</span>WeaknessYN) <span class="sc">%&gt;%</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">!</span>MyalgiaYN)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="categoricalordinal-predictors" class="level2">
+<h2 class="anchored" data-anchor-id="categoricalordinal-predictors">Categorical/Ordinal Predictors</h2>
+<p>For an easier time building and handling the model, categorical variables will be coded as unordered factors and others as ordered factors.</p>
+<section id="categorical-variables" class="level3">
+<h3 class="anchored" data-anchor-id="categorical-variables">Categorical Variables</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Recipe Creation</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>categorical_recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="sc">~</span> SwollenLymphNodes <span class="sc">+</span> ChestCongestion <span class="sc">+</span> ChillsSweats <span class="sc">+</span> NasalCongestion <span class="sc">+</span> Sneeze <span class="sc">+</span> Fatigue <span class="sc">+</span> SubjectiveFever <span class="sc">+</span> Headache <span class="sc">+</span> RunnyNose <span class="sc">+</span> AbPain <span class="sc">+</span> ChestPain <span class="sc">+</span> Diarrhea <span class="sc">+</span> EyePn <span class="sc">+</span> Insomnia <span class="sc">+</span> ItchyEye <span class="sc">+</span> Nausea <span class="sc">+</span> EarPn <span class="sc">+</span> Hearing <span class="sc">+</span> Pharyngitis <span class="sc">+</span> Breathless <span class="sc">+</span> ToothPn <span class="sc">+</span> Vision <span class="sc">+</span> Vomit <span class="sc">+</span> Wheeze <span class="sc">+</span> Weakness <span class="sc">+</span> CoughIntensity <span class="sc">+</span> Myalgia <span class="sc">+</span> BodyTemp, <span class="at">data =</span> clean_data)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Categorical Variables</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>categorical_dummies <span class="ot">&lt;-</span> categorical_recipe <span class="sc">%&gt;%</span> </span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(SwollenLymphNodes) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(ChestCongestion) <span class="sc">%&gt;%</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(ChillsSweats) <span class="sc">%&gt;%</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(NasalCongestion) <span class="sc">%&gt;%</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(Sneeze) <span class="sc">%&gt;%</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(Fatigue) <span class="sc">%&gt;%</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(SubjectiveFever) <span class="sc">%&gt;%</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(Headache) <span class="sc">%&gt;%</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(RunnyNose) <span class="sc">%&gt;%</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(AbPain) <span class="sc">%&gt;%</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(ChestPain) <span class="sc">%&gt;%</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(Diarrhea) <span class="sc">%&gt;%</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(EyePn) <span class="sc">%&gt;%</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(Insomnia) <span class="sc">%&gt;%</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(ItchyEye) <span class="sc">%&gt;%</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(Nausea) <span class="sc">%&gt;%</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(EarPn) <span class="sc">%&gt;%</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(Hearing) <span class="sc">%&gt;%</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(Pharyngitis) <span class="sc">%&gt;%</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(Breathless) <span class="sc">%&gt;%</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(ToothPn) <span class="sc">%&gt;%</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(Vision) <span class="sc">%&gt;%</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(Vomit) <span class="sc">%&gt;%</span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(Wheeze) <span class="sc">%&gt;%</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prep</span>(<span class="at">training =</span> clean_data)</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a><span class="co"># New Dataset Generated</span></span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>categorical_dummies <span class="ot">&lt;-</span> <span class="fu">bake</span>(categorical_dummies, <span class="at">new_data =</span> <span class="cn">NULL</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="ordered-factors" class="level3">
+<h3 class="anchored" data-anchor-id="ordered-factors">Ordered Factors</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Ordered Factors Using Previous Objects Generated</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>ord_recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="sc">~</span> SwollenLymphNodes_Yes <span class="sc">+</span> ChestCongestion_Yes <span class="sc">+</span> ChillsSweats_Yes <span class="sc">+</span> NasalCongestion_Yes <span class="sc">+</span> Sneeze_Yes <span class="sc">+</span> Fatigue_Yes <span class="sc">+</span> SubjectiveFever_Yes <span class="sc">+</span> Headache_Yes <span class="sc">+</span> RunnyNose_Yes <span class="sc">+</span> AbPain_Yes <span class="sc">+</span> ChestPain_Yes <span class="sc">+</span> Diarrhea_Yes <span class="sc">+</span> EyePn_Yes <span class="sc">+</span> Insomnia_Yes <span class="sc">+</span> ItchyEye_Yes <span class="sc">+</span> Nausea_Yes <span class="sc">+</span> EarPn_Yes <span class="sc">+</span> Hearing_Yes <span class="sc">+</span> Pharyngitis_Yes <span class="sc">+</span> Breathless_Yes <span class="sc">+</span> ToothPn_Yes <span class="sc">+</span> Vision_Yes <span class="sc">+</span> Vomit_Yes <span class="sc">+</span> Wheeze_Yes <span class="sc">+</span> Weakness <span class="sc">+</span> CoughIntensity <span class="sc">+</span> Myalgia <span class="sc">+</span> BodyTemp, <span class="at">data =</span> categorical_dummies)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Change Expected Ordinal Variables to Ordered Factors</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>categorical_dummies<span class="sc">$</span>Weakness <span class="ot">&lt;-</span> <span class="fu">as.ordered</span>(categorical_dummies<span class="sc">$</span>Weakness)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>categorical_dummies<span class="sc">$</span>Myalgia <span class="ot">&lt;-</span> <span class="fu">as.ordered</span>(categorical_dummies<span class="sc">$</span>Myalgia)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>categorical_dummies<span class="sc">$</span>CoughIntensity <span class="ot">&lt;-</span> <span class="fu">as.ordered</span>(categorical_dummies<span class="sc">$</span>CoughIntensity)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Ordinal Variables</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>ord_dummies <span class="ot">&lt;-</span> ord_recipe <span class="sc">%&gt;%</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_ordinalscore</span>(CoughIntensity) <span class="sc">%&gt;%</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_ordinalscore</span>(Myalgia) <span class="sc">%&gt;%</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_ordinalscore</span>(Weakness) <span class="sc">%&gt;%</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prep</span>(<span class="at">training =</span> categorical_dummies)</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate New Dataset</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>ord_dummies <span class="ot">&lt;-</span> <span class="fu">bake</span>(ord_dummies, <span class="at">new_data =</span> <span class="cn">NULL</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="removal-of-near-zero-variance-predictors" class="level3">
+<h3 class="anchored" data-anchor-id="removal-of-near-zero-variance-predictors">Removal of Near-Zero Variance Predictors</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>filtered_process <span class="ot">&lt;-</span> ord_recipe <span class="sc">%&gt;%</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_nzv</span>(<span class="fu">all_predictors</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prep</span>(<span class="at">training =</span> ord_dummies)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Final Cleaned Dataset</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>clean_data_March <span class="ot">&lt;-</span> <span class="fu">bake</span>(filtered_process, <span class="at">new_data =</span> <span class="cn">NULL</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="saving-copy-of-new-data" class="level1">
+<h1>Saving Copy of New Data</h1>
+<p>This newer cleaned dataset shall be saved as well to be used in the “machinelearning.qmd” document.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Pathing</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>data_path <span class="ot">&lt;-</span> <span class="fu">here</span>(<span class="st">"fluanalysis"</span>, <span class="st">"data"</span>, <span class="st">"cleaned_data_March.rds"</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Saving Dataset as RDS</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(clean_data_March, <span class="at">file =</span> data_path)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 
