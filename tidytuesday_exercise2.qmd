@@ -1,0 +1,268 @@
+---
+title: "Tidy Tuesday Exercise 2"
+output: 
+  html_document:
+    toc: FALSE
+---
+
+# Source
+
+The GitHub repository for TidyTuesday was cloned from <https://github.com/rfordatascience/tidytuesday>, and the CSV files for 4/11/2023 were copied and pasted into the *data* folder of this portfolio.
+
+# Load Libraries
+
+```{r Setup: Libraries}
+# Data Handling
+library(tidyverse)
+## Information About NAs
+library(dlookr)
+
+# Model Handling
+library(tidymodels)
+library(rpart)
+```
+
+# Load Data
+
+```{r Load Data}
+# First Dataset
+cage_free_data <- read_csv("data/cage-free-percentages.csv")
+
+# Second Dataset
+egg_production_data <- read_csv("data/egg-production.csv")
+```
+
+# Explore Data
+
+```{r Preliminary Data Structure Exploration}
+# Cage-Free Eggs
+str(cage_free_data)
+summary(cage_free_data)
+head(cage_free_data)
+plot_na_pareto(cage_free_data)
+
+# Egg Production
+str(egg_production_data)
+summary(egg_production_data)
+head(egg_production_data)
+# plot_na_pareto(egg_production_data) <-- Was edited out since no NA values were found for this dataset.
+```
+
+# Question(s) and Hypothesis
+
+Upon reviewing the datasets, two questions have come to mind:
+
+-   Is there a month in which more eggs are produced than others?
+
+-   Have the percentages of cage-free hens and eggs increased over time?
+
+The hypotheses are therefore:
+
+-   August sees the greatest production of eggs in general.
+
+-   The percentages of cage-free hens and eggs have increased through the years.
+
+# Data Cleaning, Manipulation, and Processing
+
+The data given by TidyTuesday appears mostly clean already, though it would probably be better to combine the two datasets into one during data cleaning/manipulation. According to the README, the cage-free data refers to what percent of hens and eggs out of all the production facilities in the United States are cage-free. It is therefore likely that the information in `cage_free_data` is already contained in `egg_production_data` in some way.
+
+The two datasets also begin at different points in time, so we will choose the dataset that starts more recently (aka `egg_production_data`). Furthermore, since `observed month` comes in sets of 2, that makes it relatively easy to calculate total number of hens and eggs for each month indicated.
+
+## Make Column for Month
+
+```{r}
+egg_production_data <- egg_production_data %>%
+  mutate(Month = month(ymd(observed_month))) %>%
+  mutate(character_month = case_when(
+    Month == 1 ~ "January",
+    Month == 2 ~ "February",
+    Month == 3 ~ "March",
+    Month == 4 ~ "April",
+    Month == 5 ~ "May",
+    Month == 6 ~ "June",
+    Month == 7 ~ "July",
+    Month == 8 ~ "August",
+    Month == 9 ~ "September",
+    Month == 10 ~ "October",
+    Month == 11 ~ "November",
+    Month == 12 ~ "December"))
+
+egg_production_data$character_month <- factor(egg_production_data$character_month, levels = c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"), ordered = TRUE)
+
+```
+
+## Calculate Total Eggs Produced Each Month
+
+```{r Total Eggs Produced Each Month}
+# Have Columns to Refer Back to Previous/Next Entries
+compatible_egg_production_data <- egg_production_data %>%
+  arrange(observed_month) %>%
+  mutate(previous_n_hens = lag(n_hens, n = 1)) %>%
+  mutate(previous_n_eggs = lag(n_eggs, n = 1)) %>%
+  mutate(proximo_n_hens = lead(n_hens, n = 1)) %>%
+  mutate(proximo_n_eggs = lead(n_eggs, n = 1))
+
+# Calculate Total Number of Hens and Eggs Based on Row Divisibility (Each Month Appears Twice)
+row_EO <- NA
+for (row in 1:nrow(compatible_egg_production_data)) {
+  row_EO <- c(row_EO, row)
+}
+row_EO <- row_EO[2:221]
+compatible_egg_production_data$row_EO <- row_EO
+
+compatible_egg_production_data <- compatible_egg_production_data %>%
+  mutate(total_n_hens = case_when(
+    row_EO %% 2 == 0 ~ n_hens + previous_n_hens,
+    TRUE ~ n_hens + proximo_n_hens)) %>%
+  mutate(total_n_eggs = case_when(
+    row_EO %% 2 == 0 ~ n_eggs + previous_n_eggs,
+    TRUE ~ n_eggs + proximo_n_eggs))
+```
+
+# Data Visualization
+
+## Production of Eggs by Month
+
+```{r Production of Eggs by Month}
+ggplot(compatible_egg_production_data, aes(x = character_month, y = total_n_eggs)) + geom_boxplot() + geom_point() + geom_jitter()
+```
+
+It appears that August is not when the most eggs are produced; rather, most eggs are produced in January and December, though it is noteworthy that July has a very high median of egg production in comparison to other months.
+
+## Change in Percentage of Cage-Free Hens/Eggs Over Time
+
+```{r Change in Percentage of Cage Free Outcomes of Interest Over Time}
+# Hens
+ggplot(cage_free_data %>% arrange(observed_month), aes(x = observed_month, y = percent_hens)) + geom_point() + geom_line() + geom_smooth()
+
+# Eggs
+ggplot(cage_free_data %>% arrange(observed_month), aes(x = observed_month, y = percent_eggs)) + geom_point() + geom_line() + geom_smooth()
+```
+
+It appears that the percentage of cage-free eggs has increased dramatically over time.
+
+# Machine Learning
+
+At this point, I would like to see machine learning models for linear regression, tree, random forest, and LASSO to predict egg count and compare its performance on "training" data to "test" data.
+
+## Setup
+
+```{r Machine Learning Setup}
+# Choose Predictors of Interest and Outcomes
+egg_production_data <- egg_production_data %>% select(!c("observed_month", "source", "character_month"))
+
+# Reproducibility
+set.seed(123)
+
+# Split Egg Production Data
+data_division <- initial_split(egg_production_data, prop = 7/10)
+train_data <- training(data_division)
+test_data <- testing(data_division)
+
+post_cv <- vfold_cv(train_data)
+
+# Recipe
+egg_recipe <- recipe(n_eggs ~ ., data = train_data)
+
+# Workflow
+## Linear Model
+linear_model <- linear_reg() %>% set_engine("lm")
+linear_workflow <- workflow() %>%
+  add_model(linear_model) %>%
+  add_recipe(egg_recipe)
+
+## Tree Model
+tree_model <- decision_tree(cost_complexity = tune(), tree_depth = tune()) %>% set_engine("rpart") %>% set_mode("regression")
+tree_grid <- grid_regular(
+  cost_complexity(),
+  tree_depth(),
+  levels = 5
+)
+tree_workflow <- workflow() %>%
+  add_model(tree_model) %>%
+  add_formula(n_eggs ~ .)
+
+## Random Forest
+random_forest_model <- rand_forest(mtry = tune(), min_n = tune(), trees = 1000) %>%
+  set_engine("ranger", importance = 'impurity') %>%
+  set_mode("regression")
+random_forest_workflow <- workflow() %>%
+  add_recipe(egg_recipe) %>%
+  add_model(random_forest_model)
+
+## LASSO
+lasso_model <- linear_reg(penalty = tune(), mixture = 1) %>% set_engine("glmnet")
+lasso_workflow <- workflow() %>% add_model(lasso_model) %>% add_formula(n_eggs ~ .)
+lasso_grid <- tibble(penalty = 10^seq(-4, -1, length.out = 30))
+```
+
+## Fitting
+
+```{r}
+# Linear Model
+fit_linear <- linear_workflow %>% fit(train_data)
+fit_linear %>% extract_fit_parsnip() %>% tidy()
+
+linear_augment <- augment(fit_linear, train_data)
+linear_augment %>% select(n_eggs, .pred) %>% rmse(n_eggs, .pred)
+
+## RMSE: 133763971
+
+# Tree Model
+tree_tuned <- tree_workflow %>%
+  tune_grid(resamples = post_cv, grid = tree_grid)
+tree_tuned %>% collect_metrics()
+tree_tuned %>% show_best(metric = "rmse") %>% arrange(mean)
+best_tree <- tree_tuned %>% select_best(metric = "rmse")
+best_tree
+
+## RMSE: 174031309
+
+# Random Forest
+doParallel::registerDoParallel()
+random_forest_tuned <- random_forest_workflow %>%
+  tune_grid(
+    resamples = post_cv,
+    grid = 15,
+    control = control_grid(save_pred = TRUE),
+    metrics = metric_set(rmse)
+  )
+random_forest_tuned %>% show_best(metric = "rmse")
+best_random_forest <- random_forest_tuned %>% select_best(metric = "rmse")
+
+## RMSE: 150855368
+
+# LASSO
+lasso_tuned <- lasso_workflow %>% 
+  tune_grid(resamples = post_cv, 
+            grid = lasso_grid, 
+            control = control_grid(verbose = FALSE, save_pred = TRUE),
+            metrics = metric_set(rmse))
+
+lasso_tuned %>% collect_metrics()
+lasso_tuned %>% show_best("rmse")
+lasso_best <- lasso_tuned %>% select_best("rmse")
+
+## RMSE: 127279088
+```
+
+## Evaluation
+
+Based on the above, the LASSO model performed the best with the lowest RMSE.
+
+```{r Final Fit to Test Data}
+final_workflow <- lasso_workflow %>% finalize_workflow(lasso_best)
+final_workflow %>% fit(train_data) %>% extract_fit_parsnip() %>% tidy()
+final_workflow %>% fit(train_data) %>% augment(train_data) %>% rmse(n_eggs, .pred)
+# RMSE for Training Data: 135992484
+
+final_workflow %>% fit(test_data) %>% extract_fit_parsnip() %>% tidy()
+final_workflow %>% fit(test_data) %>% augment(test_data) %>% rmse(n_eggs, .pred)
+# RMSE for Testing Data: 89508484
+```
+
+It is slightly surprising to me that the LASSO model performs better on the testing data than on the training data.
+
+# Discussion
+
+From this analysis, the hypothesis that August is the month of highest egg production has been proved false. However, the hypothesis that percentage of cage-free hens and eggs increasing over time appears to be confirmed. While none of the models fitted to the training data had a low RMSE, the LASSO model had the lowest of them and performed better on the testing data than on the training data.

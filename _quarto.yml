@@ -18,6 +18,8 @@ website:
             href: ./tidytuesday_exercise.html
           - text: "Module 4: Data Analysis Exercise (Week of 1/30)"
             href: ./dataanalysis_exercise.html
+          - text: "Tidy Tuesday Exercise 2"
+            href: ./tidytuesday_exercise2.html
       - text: "Flu Analysis"
         menu: 
           - text: "Wrangling"
